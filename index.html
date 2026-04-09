@@ -1,171 +1,2221 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trimble | SDR & AE Partnership Playbook</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --trimble-blue: #0063A3;
-            --trimble-gold: #FBAD26;
-            --hero-gray: #252A2E;
-            --canvas-gray: #F1F1F6;
-            --border-gray: #E0E1E9;
-        }
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Users, Target, Zap, TrendingUp, ShieldCheck, MessageSquare, ChevronRight, 
+  BookOpen, Award, BarChart3, Search, Handshake, Calendar, Heart, Database, 
+  BellRing, CheckCircle2, UserCheck, Briefcase, Globe, Building2, Layers, 
+  Network, Split, Trophy, Flag, ArrowRightLeft, AlertTriangle, RotateCcw, 
+  ClipboardList, CheckSquare, RefreshCw, FileText, MailCheck, MessageCircle, 
+  Clock, ExternalLink, ShieldAlert, BarChart, Eye, Settings, Activity, 
+  UserPlus, XCircle, Mail, Send, Anchor, Compass, Info, Star, Repeat, 
+  PieChart, Filter, ListChecks, Maximize2, MoveUp, Map, Lightbulb, Workflow,
+  TrendingDown, DollarSign, Percent, Gauge, GraduationCap, RotateCw, HeartHandshake,
+  Rocket, ClipboardCheck, BookCheck, MonitorPlay, Users2, FileCheck, Landmark,
+  ChevronDown, Scale, List, ArrowRight, AlertCircle, Copy, Check
+} from 'lucide-react';
 
-        body { font-family: 'Open Sans', sans-serif; background-color: var(--canvas-gray); color: var(--hero-gray); scroll-behavior: smooth; }
-        
-        .h1-hero { font-size: 4.75rem; line-height: 1.1; font-weight: 800; letter-spacing: -0.04em; }
-        .h2-section { font-size: 2.25rem; font-weight: 800; line-height: 1.2; border-bottom: 8px solid var(--trimble-gold); padding-bottom: 1rem; margin-bottom: 2rem; }
-        .h3-sub { font-size: 1.25rem; font-weight: 700; color: var(--trimble-blue); }
+const TrimbleColors = {
+  blue: '#003DA5',
+  gray: '#252A2E',
+  lightGray: '#F5F5F5',
+  yellow: '#FBAD26',
+  white: '#FFFFFF',
+  border: '#E2E8F0',
+  midBlue: '#4B9CD3',
+  midGray: '#94A3B8'
+};
 
-        .card-container {
-            background: white; border: 1px solid var(--border-gray); border-radius: 2rem;
-            padding: 2.5rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.04);
-            position: relative; z-index: 10; break-inside: avoid;
-        }
+const TrimbleLogoMark = ({ size = 32, className = "" }) => (
+  <img 
+    src="https://ui-avatars.com/api/?name=Trimble&background=003DA5&color=fff&rounded=true" 
+    alt="Trimble Logo"
+    style={{ width: size, height: size }}
+    className={`object-contain rounded-md ${className}`}
+    onError={(e) => {
+      e.target.onerror = null;
+      // Updated to a more reliable fallback URL
+      e.target.src = "https://upload.wikimedia.org/wikipedia/commons/e/ed/Trimble_Logo.svg";
+    }}
+  />
+);
 
-        .active-nav { background-color: var(--trimble-blue); color: white !important; }
+// --- SHARED UI COMPONENTS ---
 
-        @media print {
-            .no-print { display: none !important; }
-            header, aside { position: static !important; display: none !important; }
-            body { background: white !important; }
-            main { padding: 0 !important; max-width: 100% !important; margin: 0 !important; }
-            section { display: block !important; page-break-after: always; padding: 1cm !important; }
-            .card-container { box-shadow: none !important; border: 1px solid #eee !important; break-inside: avoid !important; }
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        }
-    </style>
-</head>
-<body class="antialiased overflow-x-hidden">
 
-    <header class="no-print sticky top-0 z-50 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm">
-        <div class="flex items-center gap-3">
-            <svg width="32" height="32" viewBox="0 0 100 100"><path d="M50 5L95 82.5H5L50 5Z" fill="#0063A3"/><circle cx="50" cy="52" r="22" stroke="white" stroke-width="4"/></svg>
-            <span class="text-[#0063A3] font-extrabold text-2xl tracking-tighter">Trimble</span>
-            <div class="h-6 w-px bg-gray-300 mx-2"></div>
-            <h1 class="text-sm font-semibold uppercase tracking-wider text-gray-500">Partnership Playbook 2026</h1>
+const TopHeader = () => (
+  <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm">
+    <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        <TrimbleLogoMark size={24} />
+        <span style={{ color: TrimbleColors.blue, fontWeight: '900', fontSize: '22px', fontFamily: 'Open Sans, sans-serif', letterSpacing: '-0.03em' }}>Trimble</span>
+      </div>
+      <div className="h-6 w-px bg-gray-300 mx-2 hidden md:block"></div>
+      <h1 className="text-sm font-semibold uppercase tracking-wider text-gray-500 hidden md:block italic">Partnership Foundation</h1>
+    </div>
+    <div className="flex items-center gap-4">
+      <span className="text-xs font-bold text-gray-400 uppercase tracking-widest hidden sm:block">Internal Use Only</span>
+      <button className="bg-[#003DA5] text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-800 transition-colors shadow-lg shadow-blue-100">
+        Export PDF
+      </button>
+    </div>
+  </header>
+);
+
+const SectionHeading = ({ title, subtitle, light = false }) => (
+  <div className="mb-10">
+    <h2 className={`text-3xl md:text-4xl font-extrabold mb-2 ${light ? 'text-white' : 'text-[#252A2E]'}`}>{title}</h2>
+    {subtitle && <p className={`${light ? 'text-[#FBAD26]' : 'text-[#003DA5]'} font-bold uppercase tracking-[0.2em] text-xs`}>{subtitle}</p>}
+    <div className="h-1.5 w-24 bg-[#FBAD26] mt-6 rounded-full"></div>
+  </div>
+);
+
+const SubHeading = ({ title, icon: Icon, color = "#003DA5" }) => (
+  <h3 className="text-xl font-bold text-[#252A2E] mb-6 flex items-center gap-3">
+    {Icon && <Icon style={{ color }} size={24} />}
+    {title}
+  </h3>
+);
+
+const ROECard = ({ icon: Icon, title, desc, items }) => (
+  <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
+    <div className="bg-blue-50 w-12 h-12 rounded-xl flex items-center justify-center text-[#003DA5] mb-6">
+      <Icon size={24} />
+    </div>
+    <h4 className="text-lg font-bold text-gray-900 mb-3">{title}</h4>
+    <p className="text-sm text-gray-500 leading-relaxed mb-6 flex-grow">{desc}</p>
+    <ul className="space-y-2">
+      {items.map((item, i) => (
+        <li key={i} className="flex items-center gap-2 text-xs font-bold text-[#003DA5]">
+          <CheckCircle2 size={14} className="text-[#FBAD26]" />
+          {item}
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
+const SectionHero = ({ title, subtitle, image }) => (
+  <div className="relative w-full h-[300px] flex items-center justify-center overflow-hidden rounded-[2.5rem] mb-12 shadow-2xl">
+    <div 
+      className="absolute inset-0 bg-cover bg-center transition-transform duration-[20s] hover:scale-110" 
+      style={{ backgroundImage: `url("${image}")` }}
+    />
+    <div className="absolute inset-0 bg-gradient-to-r from-[#003DA5]/90 to-transparent z-10"></div>
+    <div className="relative z-20 px-12 w-full text-left">
+      <p className="text-[#FBAD26] font-black uppercase tracking-[0.3em] text-xs mb-3">{subtitle}</p>
+      <h2 className="text-4xl md:text-5xl font-black text-white leading-tight uppercase tracking-tighter drop-shadow-lg">{title}</h2>
+      <div className="h-1.5 w-24 bg-[#FBAD26] mt-6 rounded-full shadow-lg"></div>
+    </div>
+  </div>
+);
+
+const ResponsibilityList = ({ title, items, color = "#003DA5" }) => (
+  <div className="space-y-6">
+    <h4 className="text-lg font-bold flex items-center gap-2" style={{ color }}>
+      <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: color }}></div>
+      {title}
+    </h4>
+    <ul className="space-y-4">
+      {items.map((item, i) => (
+        <li key={i} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow h-full">
+          <p className="font-bold text-sm text-gray-900 mb-2 uppercase tracking-tighter">{item.label}</p>
+          <ul className="space-y-1.5">
+            {item.details.map((detail, j) => (
+              <li key={j} className="text-xs text-gray-600 flex items-start gap-2">
+                <span className="text-[#FBAD26] font-bold mt-0.5">•</span>
+                {detail}
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
+const FeedbackTemplate = ({ title, content, type = "google" }) => (
+  <div className={`rounded-xl overflow-hidden border ${type === 'google' ? 'border-blue-100 shadow-blue-50' : type === 'email' ? 'border-yellow-100 shadow-yellow-50' : 'border-slate-200 shadow-sm'} mb-6 shadow-md`}>
+    <div className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${type === 'google' ? 'bg-blue-600 text-white' : type === 'email' ? 'bg-[#FBAD26] text-black' : 'bg-slate-200 text-slate-600'}`}>
+      {type === 'google' ? <MessageCircle size={14}/> : type === 'email' ? <Mail size={14}/> : <Database size={14}/>}
+      {title || (type === 'google' ? 'Google Chat Template' : type === 'email' ? 'Email Template' : 'Salesforce DX Template')}
+    </div>
+    <div className="p-5 bg-white font-mono text-[11px] text-slate-700 whitespace-pre-wrap leading-relaxed border-t border-slate-100 max-h-[500px] overflow-y-auto">
+      {content}
+    </div>
+  </div>
+);
+
+const PrincipleBlock = ({ icon: Icon, title, intro, bullets }) => (
+  <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm flex flex-col hover:border-[#003DA5] transition-colors h-full">
+    <div className="p-6 border-b border-gray-50 flex items-center gap-4 bg-slate-50/50">
+      <div className="bg-[#003DA5] p-3 rounded-lg text-white shadow-lg shadow-blue-100">
+        <Icon size={24} />
+      </div>
+      <h3 className="text-xl font-bold text-[#252A2E]">{title}</h3>
+    </div>
+    <div className="p-6 flex-grow">
+      <p className="text-gray-500 text-sm mb-6 leading-relaxed italic">{intro}</p>
+      <div className="space-y-3">
+        {bullets.map((bullet, idx) => (
+          <div key={idx} className="flex items-start gap-3 group">
+            <CheckCircle2 size={16} className="text-[#FBAD26] mt-1 shrink-0 transition-transform group-hover:scale-110" />
+            <span className="text-sm text-gray-700 font-medium leading-snug">{bullet}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const ManagerActivityCard = ({ title, icon: Icon, items, focus }) => (
+  <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all group h-full flex flex-col">
+    <div className="flex items-center gap-4 mb-8">
+      <div className="p-3 bg-blue-50 rounded-xl text-[#003DA5] group-hover:bg-[#003DA5] group-hover:text-white transition-colors">
+        <Icon size={32} />
+      </div>
+      <h4 className="text-xl font-bold text-gray-900 leading-tight">{title}</h4>
+    </div>
+    <div className="space-y-8 flex-grow">
+      <div>
+        <p className="text-[10px] font-black uppercase text-[#FBAD26] tracking-[0.2em] mb-4">Inspection Checklist</p>
+        <ul className="space-y-3 text-xs">
+          {items.map((item, i) => (
+            <li key={i} className="flex items-start gap-3">
+              <CheckSquare size={16} className="text-[#003DA5] mt-0.5 shrink-0" />
+              <span className="font-medium">{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+    <div className="pt-6 border-t border-gray-50 bg-slate-50/50 -mx-8 -mb-8 p-8 rounded-b-3xl mt-auto">
+      <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-3">Goal Focus</p>
+      <p className="text-11px text-gray-500 italic leading-relaxed">{focus}</p>
+    </div>
+  </div>
+);
+
+const Footer = () => (
+  <footer className="bg-white border-t border-gray-200 py-16 px-6 mt-16">
+    <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
+      <div className="flex items-center gap-6">
+        <TrimbleLogoMark size={60} className="rounded-xl" />
+        <div>
+          <p className="font-extrabold text-xl text-gray-900 leading-tight">Trimble Revenue Organization</p>
+          <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">Transforming the way the world works.</p>
         </div>
-        <button onclick="window.print()" class="bg-[#0063A3] text-white px-6 py-2 rounded-full text-xs font-black tracking-widest hover:bg-blue-800 shadow-lg">PRINT CLEAN PDF</button>
-    </header>
+      </div>
+      <div className="flex flex-wrap justify-center gap-8 text-xs font-black text-[#003DA5] uppercase tracking-widest">
+        <a href="#" className="hover:text-[#FBAD26] transition-colors">Privacy Policy</a>
+        <a href="#" className="hover:text-[#FBAD26] transition-colors">Sales Enablement</a>
+        <a href="#" className="hover:text-[#FBAD26] transition-colors">Compliance</a>
+        <a href="#" className="hover:text-[#FBAD26] transition-colors">Feedback</a>
+      </div>
+    </div>
+    <div className="max-w-6xl mx-auto mt-12 pt-8 border-t border-gray-100 text-center text-[10px] text-gray-400 font-bold uppercase tracking-[0.4em]">
+      © 2026 Trimble Inc. All Rights Reserved.
+    </div>
+  </footer>
+);
 
-    <div class="flex max-w-[1600px] mx-auto">
-        <aside class="no-print hidden lg:block w-72 shrink-0 p-8 border-r border-gray-100 bg-white sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto">
-            <nav class="space-y-1">
-                <p class="text-[10px] uppercase font-black text-gray-400 tracking-[0.2em] mb-6 italic">Navigation Index</p>
-                <button onclick="scrollToSection('cover')" class="nav-btn active w-full flex items-center gap-3 p-3 rounded-xl text-left text-sm font-bold text-gray-600 hover:bg-slate-50 transition-all" data-section="cover"><i data-lucide="book-open" class="w-4 h-4"></i> 1. Overview</button>
-                <button onclick="scrollToSection('principles')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-xl text-left text-sm font-bold text-gray-600 hover:bg-slate-50 transition-all" data-section="principles"><i data-lucide="heart" class="w-4 h-4"></i> 2. Principles</button>
-                <button onclick="scrollToSection('roles')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-xl text-left text-sm font-bold text-gray-600 hover:bg-slate-50 transition-all" data-section="roles"><i data-lucide="users" class="w-4 h-4"></i> 3. Responsibilities</button>
-                <button onclick="scrollToSection('roe')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-xl text-left text-sm font-bold text-gray-600 hover:bg-slate-50 transition-all" data-section="roe"><i data-lucide="shield-check" class="w-4 h-4"></i> 4. ROE Standards</button>
-                <button onclick="scrollToSection('handoff')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-xl text-left text-sm font-bold text-gray-600 hover:bg-slate-50 transition-all" data-section="handoff"><i data-lucide="anchor" class="w-4 h-4"></i> 5. BOAT Handoff</button>
-                <button onclick="scrollToSection('cadence')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-xl text-left text-sm font-bold text-gray-600 hover:bg-slate-50 transition-all" data-section="cadence"><i data-lucide="clock" class="w-4 h-4"></i> 6. Comm Cadence</button>
-                <button onclick="scrollToSection('strategy')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-xl text-left text-sm font-bold text-gray-600 hover:bg-slate-50 transition-all" data-section="strategy"><i data-lucide="map" class="w-4 h-4"></i> 7. Target Strategy</button>
-                <button onclick="scrollToSection('metrics')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-xl text-left text-sm font-bold text-gray-600 hover:bg-slate-50 transition-all" data-section="metrics"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> 8. Performance</button>
-                <button onclick="scrollToSection('career')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-xl text-left text-sm font-bold text-gray-600 hover:bg-slate-50 transition-all" data-section="career"><i data-lucide="graduation-cap" class="w-4 h-4"></i> 9. Career & Dev</button>
-            </nav>
-        </aside>
+// --- FEEDBACK LOOP GRAPHIC ---
+const FeedbackLoopSVG = () => (
+  <div className="relative w-full max-w-[500px] aspect-square mx-auto">
+    <svg viewBox="0 0 400 400" className="w-full h-full transform -rotate-45">
+      {/* 4 Quadrants with Pointed Ends to show Direction */}
+      
+      {/* Black: SDR books discovery call (Top Right) */}
+      <path 
+        d="M 200,20 A 180,180 0 0,1 364,136 L 390,120 L 375,160 L 335,145 L 364,136 A 170,170 0 0,0 200,30 Z" 
+        fill={TrimbleColors.gray}
+      />
+      
+      {/* Dark Blue: AE runs discovery call (Bottom Right) */}
+      <path 
+        d="M 380,200 A 180,180 0 0,1 264,364 L 280,390 L 240,375 L 255,335 L 264,364 A 170,170 0 0,0 370,200 Z" 
+        fill={TrimbleColors.blue}
+      />
 
-        <main class="flex-1 p-6 md:p-12 relative overflow-visible">
-            
-            <section id="metrics" class="mb-32">
-                <h2 class="h2-section italic">Performance Metrics & Accountability</h2>
-                
-                <div class="card-container p-0 overflow-hidden border-none shadow-2xl mb-12">
-                    <div class="bg-[#252A2E] p-8 text-white flex justify-between items-center italic">
-                        <h3 class="h3-sub uppercase text-white">Full Diagnostic Guide for Managers</h3>
-                        <span class="text-[10px] font-black text-[#FBAD26] uppercase tracking-widest">11-Point Verification</span>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-slate-100 text-[9px] font-black uppercase text-gray-500 border-b">
-                                <tr><th class="p-4 w-1/4">Signal</th><th class="p-4 w-1/3">Possible Reasons</th><th class="p-4 w-1/3 text-[#0063A3]">Manager Coaching Action</th></tr>
-                            </thead>
-                            <tbody class="text-[10px] font-bold text-gray-700 divide-y divide-gray-100">
-                                <tr><td class="p-4">Low Activity</td><td>Research-paralysis; Call reluctance.</td><td class="p-4 text-[#0063A3]">Establish call blocks; Review territory.</td></tr>
-                                <tr><td class="p-4">Low SAO Conversion</td><td>Weak hooks; Wrong personas.</td><td class="p-4 text-[#0063A3]">Live call reviews; Refine ICP targeting.</td></tr>
-                                <tr><td class="p-4">Low SQO Conversion</td><td>Lack of depth; Poor handoff context.</td><td class="p-4 text-[#0063A3]">Audit SAOs together; Re-anchor standards.</td></tr>
-                                <tr><td class="p-4">High Disqualify Rate</td><td>Weak Need validation; Misaligned goals.</td><td class="p-4 text-[#0063A3]">Pattern analysis by industry vertical.</td></tr>
-                                <tr><td class="p-4">Strong Pipe, Low Win Rate</td><td>Execution breakdown at close.</td><td class="p-4 text-[#0063A3]">Partner with AE leadership on deal inspection.</td></tr>
-                                <tr><td class="p-4">Delayed Progression</td><td>Delayed follow-up; Lack of urgency.</td><td class="p-4 text-[#0063A3]">Reinforce SLAs; Coach on driving commitment.</td></tr>
-                                <tr><td class="p-4">Low AE Acceptance</td><td>Trust breakdown; Inconsistent quality.</td><td class="p-4 text-[#0063A3]">Facilitate SDR+AE alignment sessions.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
+      {/* Light Blue: AE Provides Feedback (Bottom Left) */}
+      <path 
+        d="M 200,380 A 180,180 0 0,1 36,264 L 10,280 L 25,240 L 65,255 L 36,264 A 170,170 0 0,0 200,370 Z" 
+        fill={TrimbleColors.midBlue}
+      />
 
-            <section id="career" class="mb-32">
-                <h2 class="h2-section italic border-[#FBAD26]">Career Development & Onboarding</h2>
-                <div class="card-container bg-[#252A2E] text-white p-12 text-center border-none shadow-2xl mb-12">
-                    <i data-lucide="rocket" class="w-16 h-16 text-[#FBAD26] mx-auto mb-8 animate-bounce"></i>
-                    <h3 class="h1-hero text-4xl mb-4 italic">The Future Seller Pathway</h3>
-                    <p class="text-xl text-gray-400 italic font-light max-w-2xl mx-auto leading-relaxed">Preparing high-performing SDRs for full-cycle Account Executive ownership through a structured learning journey.</p>
-                </div>
+      {/* Gray: SDR Refines Targeting (Top Left) */}
+      <path 
+        d="M 20,200 A 180,180 0 0,1 136,36 L 120,10 L 160,25 L 145,65 L 136,36 A 170,170 0 0,0 30,200 Z" 
+        fill={TrimbleColors.midGray}
+      />
+    </svg>
 
-                <div class="grid lg:grid-cols-2 gap-12 mb-16">
-                    <div class="card-container">
-                        <h4 class="h4-label text-[#0063A3] mb-6">SDR Learning Track</h4>
-                        <ul class="space-y-4 text-xs font-bold text-gray-600">
-                            <li class="flex gap-3"><i data-lucide="check" class="text-green-500"></i> <strong>The Value of a Meeting:</strong> Shifting focus to deal progression.</li>
-                            <li class="flex gap-3"><i data-lucide="check" class="text-green-500"></i> <strong>AE Ride-Alongs:</strong> Observing discovery impact navigation.</li>
-                            <li class="flex gap-3"><i data-lucide="check" class="text-green-500"></i> <strong>Strategic Partner Shift:</strong> Moving from activity to business impact.</li>
-                        </ul>
-                    </div>
-                    <div class="card-container">
-                        <h4 class="h4-label text-[#0063A3] mb-6">AE Development Track</h4>
-                        <ul class="space-y-4 text-xs font-bold text-gray-600">
-                            <li class="flex gap-3"><i data-lucide="check" class="text-green-500"></i> <strong>Complexity Respect:</strong> Learning research ambiguity effort.</li>
-                            <li class="flex gap-3"><i data-lucide="check" class="text-green-500"></i> <strong>SDR Ride-Alongs:</strong> Observing live prospecting blocks.</li>
-                            <li class="flex gap-3"><i data-lucide="check" class="text-green-500"></i> <strong>Coaching Accountability:</strong> Training on 48h specific feedback.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="card-container border-l-[12px] border-l-[#FBAD26]">
-                    <h4 class="h4-label mb-8 italic">Core Competency Outcomes</h4>
-                    <div class="grid md:grid-cols-2 gap-8 text-[11px] font-black uppercase tracking-tighter italic">
-                        <div class="flex gap-4 items-center"><i data-lucide="shield-check" class="text-[#FBAD26]"></i> Discovery Mastery</div>
-                        <div class="flex gap-4 items-center"><i data-lucide="shield-check" class="text-[#FBAD26]"></i> Business Case Validation</div>
-                        <div class="flex gap-4 items-center"><i data-lucide="shield-check" class="text-[#FBAD26]"></i> Pipeline Advancement</div>
-                        <div class="flex gap-4 items-center"><i data-lucide="shield-check" class="text-[#FBAD26]"></i> Account Strategy</div>
-                        <div class="flex gap-4 items-center group"><i data-lucide="award" class="text-[#0063A3] animate-pulse"></i> Promotion Readiness</div>
-                    </div>
-                </div>
-            </section>
-        </main>
+    {/* Center Text */}
+    <div className="absolute inset-0 flex items-center justify-center">
+      <div className="bg-white w-24 h-24 rounded-full shadow-lg flex items-center justify-center border border-gray-100">
+        <TrimbleLogoMark size={40} />
+      </div>
     </div>
 
-    <script>
-        lucide.createIcons();
-        function scrollToSection(id) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth' });
-                document.querySelectorAll('.nav-btn').forEach(btn => {
-                    btn.classList.remove('active-nav');
-                    if(btn.getAttribute('data-section') === id) btn.classList.add('active-nav');
-                });
-            }
-        }
-        window.addEventListener('scroll', () => {
-            const sections = ['cover', 'principles', 'roles', 'roe', 'handoff', 'cadence', 'strategy', 'metrics', 'career'];
-            let current = '';
-            sections.forEach(s => {
-                const el = document.getElementById(s);
-                if (el) {
-                    const rect = el.getBoundingClientRect();
-                    if (rect.top <= 250) current = s;
-                }
-            });
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active-nav');
-                if(btn.getAttribute('data-section') === current) btn.classList.add('active-nav');
-            });
-        });
-    </script>
-</body>
-</html>
+    {/* Label Overlays - Corrected for rotation */}
+    <div className="absolute top-[10%] right-[10%] text-right transform rotate-0">
+      <p className="font-black text-sm text-[#252A2E] leading-tight bg-white/80 p-2 rounded shadow-sm">SDR books<br/>discovery call</p>
+    </div>
+    <div className="absolute bottom-[10%] right-[10%] text-right transform rotate-0">
+      <p className="font-black text-sm text-[#003DA5] leading-tight bg-white/80 p-2 rounded shadow-sm">AE runs<br/>discovery call</p>
+    </div>
+    <div className="absolute bottom-[10%] left-[10%] text-left transform rotate-0">
+      <p className="font-black text-sm text-[#4B9CD3] leading-tight bg-white/80 p-2 rounded shadow-sm">AE Provides<br/>Feedback</p>
+    </div>
+    <div className="absolute top-[10%] left-[10%] text-left transform rotate-0">
+      <p className="font-black text-sm text-[#94A3B8] leading-tight bg-white/80 p-2 rounded shadow-sm">SDR Refines<br/>Targeting</p>
+    </div>
+  </div>
+);
+
+// --- PLAYBOOK SECTIONS ---
+
+const CoverSection = () => (
+  <div className="space-y-16 animate-in fade-in duration-500">
+    <section className="relative w-full rounded-[3rem] flex flex-col justify-center items-center text-center overflow-hidden py-24 mb-16 shadow-2xl">
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center grayscale brightness-50 contrast-125 transition-transform duration-[15s]" 
+        style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop")' }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#003DA5]/80 to-[#252A2E]/95 z-10"></div>
+      
+      <div className="relative z-20 px-6 max-w-5xl flex flex-col items-center">
+         <div className="mb-8">
+            <div className="flex items-center gap-5 bg-white/10 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/20 shadow-2xl">
+              <TrimbleLogoMark size={72} className="rounded-2xl shadow-lg" />
+              <span style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '64px', fontFamily: 'Open Sans, sans-serif', letterSpacing: '-0.04em' }}>Trimble</span>
+            </div>
+         </div>
+         <p className="text-[#FBAD26] font-black uppercase tracking-[0.6em] text-sm mb-6 opacity-90 animate-pulse">Revenue Organization</p>
+         <h1 className="text-5xl md:text-7xl font-black text-white leading-tight mb-8 drop-shadow-2xl">
+            The SDR & AE <br />
+            <span className="text-[#FBAD26]">Partnership Foundation</span>
+         </h1>
+         <div className="h-2 w-48 bg-[#FBAD26] mx-auto rounded-full mb-12 shadow-lg shadow-yellow-500/20"></div>
+         <p className="text-xl text-gray-300 font-semibold max-w-3xl mx-auto leading-relaxed italic opacity-90">
+            Building a World-Class Sales Organization through Disciplined Collaboration and Shared Accountability
+         </p>
+      </div>
+    </section>
+
+    <section id="philosophy">
+      <SectionHero title="Objective of the Partnership" subtitle="Purpose & Philosophy" image="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2048&auto=format&fit=crop" />
+      <div className="grid md:grid-cols-3 gap-12 mb-20">
+        <div className="md:col-span-2 space-y-8 text-lg text-gray-700 leading-relaxed">
+          <p>The SDR and AE partnership exists to develop people into strategic sellers, generate qualified pipeline that move forwards with predictability, and maximize productivity across Trimble’s revenue organization through disciplined collaboration and shared accountability.</p>
+          <p>Sales Development Representatives focus on top-of-funnel engagement, prospecting, and early qualification, while Account Executives own the discovery, solution alignment, and revenue conversion stages of the sales cycle. When these roles operate in true partnership, the entire sales organization performs more effectively.</p>
+          
+          <div className="bg-blue-50 p-10 rounded-3xl border border-blue-100 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-5"><Zap size={140}/></div>
+            <p className="font-black text-[#003DA5] mb-4 uppercase tracking-widest text-xs underline decoration-[#FBAD26] underline-offset-8">The Ripple Effect of Alignment</p>
+            <p className="text-gray-800 leading-relaxed font-medium">This partnership enables the organization to develop stronger people, build higher quality pipeline, and drive greater productivity. A strong SDR & AE partnership improves performance by driving:</p>
+            <div className="grid md:grid-cols-1 gap-4 mt-6">
+                {[
+                  "Higher conversion rates: SDRs pass well-qualified opportunities when they understand what AEs need to advance and close deals.",
+                  "Shorter sales cycles: AEs begin discovery conversations with relevant context and momentum rather than re-qualifying prospects from scratch.",
+                  "More precise targeting: Continuous AE feedback helps SDRs refine outreach strategies and prioritize the accounts most likely to convert.",
+                  "Increased sales productivity: Quota-carrying sellers spend more time advancing qualified opportunities and less time filtering or reworking pipeline.",
+                  "Stronger cross-functional alignment: Marketing, Sales Development, Sales, and Operations operate against shared definitions, data, and expectations."
+                ].map(benefit => (
+                  <div key={benefit} className="flex gap-3 text-sm font-bold text-[#003DA5] bg-white/50 p-4 rounded-xl">
+                     <CheckCircle2 size={18} className="shrink-0 text-[#FBAD26]"/> {benefit}
+                  </div>
+                ))}
+            </div>
+          </div>
+          
+          {/* OPERATING PRINCIPLES */}
+          <div className="bg-[#252A2E] p-10 rounded-3xl text-white shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-5"><Award size={140}/></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-8">
+                <Award className="text-[#FBAD26]" size={32} />
+                <h3 className="text-2xl font-bold">Operating Principles</h3>
+              </div>
+              <div className="space-y-8">
+                <div>
+                  <h4 className="text-[#FBAD26] font-bold uppercase text-xs tracking-widest mb-2">Principle 1</h4>
+                  <p className="font-bold text-lg mb-1">Shared Accountability</p>
+                  <p className="text-gray-400 text-sm">Pipeline creation and progression belong to both roles; success is measured collectively.</p>
+                </div>
+                <div>
+                  <h4 className="text-[#FBAD26] font-bold uppercase text-xs tracking-widest mb-2">Principle 2</h4>
+                  <p className="font-bold text-lg mb-1">Preparation is Non-Negotiable</p>
+                  <p className="text-gray-400 text-sm">Every interaction reflects the team. Research and context are baseline expectations.</p>
+                </div>
+                <div>
+                  <h4 className="text-[#FBAD26] font-bold uppercase text-xs tracking-widest mb-2">Principle 3</h4>
+                  <p className="font-bold text-lg mb-1">Advancement Over Just Activity</p>
+                  <p className="text-gray-400 text-sm">Success is impactful progression. Meetings alone do not create revenue!</p>
+                </div>
+                <div>
+                  <h4 className="text-[#FBAD26] font-bold uppercase text-xs tracking-widest mb-2">Principle 4</h4>
+                  <p className="font-bold text-lg mb-1">Feedback Fuels Improvement</p>
+                  <p className="text-gray-400 text-sm">Open communication improves targeting, qualification, and overall execution.</p>
+                </div>
+                <div>
+                  <h4 className="text-[#FBAD26] font-bold uppercase text-xs tracking-widest mb-2">Principle 5</h4>
+                  <p className="font-bold text-lg mb-1">Development is Intentional</p>
+                  <p className="text-gray-400 text-sm">This partnership plays a crucial role in strengthening the Trimble sales organization as a whole.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-sm font-medium border-t pt-8 italic text-gray-500 leading-relaxed">
+            Beyond operational efficiency, the SDR & AE relationship is one of the most important partnerships across the revenue organization. Success depends not only on well-defined roles, but also on trust, communication, and mutual accountability. When these two roles operate in sync, they form a coordinated team capable of driving impactful customer conversations and revenue outcomes.
+          </p>
+        </div>
+        <div className="space-y-6">
+           <div className="bg-[#252A2E] text-white p-8 rounded-2xl shadow-xl border-t-4 border-[#FBAD26]">
+             <h4 className="text-[#FBAD26] font-bold mb-8 uppercase tracking-wider text-sm flex items-center gap-2">
+               <Target size={18}/> Core Beliefs
+             </h4>
+             <div className="space-y-8">
+               <div><p className="text-xs font-black text-[#FBAD26] uppercase mb-1">Pipeline Quality drives forecast accuracy</p><p className="text-xs opacity-80">Opportunities that enter the pipeline with strong qualification and context progress more predictably.</p></div>
+               <div><p className="text-xs font-black text-[#FBAD26] uppercase mb-1">Preparation builds credibility</p><p className="text-xs opacity-80">Buyers gain confidence when AE and SDR partners are aligned and informed before engaging with them.</p></div>
+               <div><p className="text-xs font-black text-[#FBAD26] uppercase mb-1">Development happens through partnership</p><p className="text-xs opacity-80">SDRs are our future sellers, and strong AE collaboration accelerates their growth and readiness.</p></div>
+               <div><p className="text-xs font-black text-[#FBAD26] uppercase mb-1">Accountability strengthens culture</p><p className="text-xs opacity-80">Shared ownership of pipeline outcomes creates a more collaborative and effective sales organization.</p></div>
+             </div>
+           </div>
+           <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-md">
+             <SubHeading title="How This Playbook Should Be Used" icon={BookOpen} />
+             <p className="text-xs text-gray-500 leading-relaxed">This playbook creates a standard for how this partnership should operate, and translates that standard into clear and actionable expectations. Each section defines how SDRs and AEs work together across critical moments in the sales process, including account prioritization, qualification, handoffs, communication structure, and performance measurement.</p>
+           </div>
+        </div>
+      </div>
+    </section>
+  </div>
+);
+
+const PrinciplesSection = () => (
+  <div className="space-y-16 animate-in fade-in duration-500">
+    <SectionHero title="Core Partnership Principles" subtitle="Operating Foundations" image="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop" />
+
+    <div className="bg-white p-10 rounded-3xl border-l-[12px] border-[#FBAD26] mb-16 shadow-lg">
+      <div className="flex gap-6 items-start">
+        <ShieldCheck className="text-[#003DA5] shrink-0" size={40} />
+        <p className="text-xl text-gray-700 leading-relaxed font-medium">
+         The foundation of the SDR & AE teams’ partnership is built on professionalism, discipline, mutual respect, and transparent communication. These cultural norms are not guidelines; they are expectations.
+        </p>
+      </div>
+    </div>
+
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <PrincipleBlock icon={Calendar} title="Respecting the Calendar" intro="Time is one of the most valuable resources for both SDRs and AEs. Respecting the calendar demonstrates professionalism, accountability, and respect for your partner’s work." bullets={["Showing up prepared and on time for scheduled meetings", "Reviewing meeting notes and context before customer calls", "Protecting time that has been blocked for prospecting or deal work", "Providing reasonable notice if a meeting must be moved or rescheduled"]} />
+      <PrincipleBlock icon={MessageSquare} title="Radical Candor" intro="The strongest partnerships require honest, constructive feedback. Both AEs and SDRs are expected to communicate openly about what is working and where improvements can be made." bullets={["Providing good feedback on meeting quality and qualification", "Addressing challenges early rather than allowing frustration to build", "Offering coaching and suggestions that help our partners improve", "Focusing feedback on behaviors and outcomes (rather than the individuals)"]} />
+      <PrincipleBlock icon={Heart} title="Assume Positive Intent" intro="Miscommunication or mistakes can occur in a fast-paced environment. Effective partnerships assume that teammates are acting with shared goals of success." bullets={["Approaching disagreements with curiosity rather than blame", "Seeking to understand context before making assumptions", "Supporting one another when challenges arise in the sales process", "Maintaining professionalism even during difficult conversations"]} />
+      <PrincipleBlock icon={Database} title="Utilize Data Over Anecdotes" intro="Sales decisions should be informed by measurable insights rather than isolated experiences. A data-driven approach ensures that decisions are aligned with performance trends." bullets={["Evaluate lead quality and meeting effectiveness using metrics", "Review conversion data and qualification outcomes to refine targeting", "Using insights and reporting from Salesforce & Gong to guide strategy", "Avoid jumping to conclusions based off of one-off deal experiences"]} />
+      <PrincipleBlock icon={BellRing} title="No Surprises" intro="Transparency and proactive communication are key. Both are responsible for keeping each other informed about changes that impact meetings or opportunities." bullets={["Communicating ASAP when a meeting may not be fully qualified", "Informing partners when prospects cancel or disengage", "Flagging potential deal risks or stakeholder concerns early", "Providing visibility into changes that affect pipeline forecasting"]} />
+      <div className="flex flex-col items-center justify-center bg-[#003DA5] p-10 rounded-3xl text-center shadow-xl">
+         <TrimbleLogoMark size={64} className="rounded-xl shadow-lg" />
+         <p className="text-[#FBAD26] text-5xl font-black mt-4 mb-2 tracking-tighter italic">TRUST</p>
+         <p className="text-white text-xs uppercase tracking-[0.4em] font-bold opacity-80 uppercase underline decoration-[#FBAD26]">The Ultimate Currency</p>
+      </div>
+    </div>
+  </div>
+);
+
+const RolesSection = () => (
+  <div className="space-y-16 animate-in fade-in duration-500">
+    <SectionHeading title="Roles & Responsibilities" subtitle="Ownership & Collaboration" />
+    
+    <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
+      <div>
+        <p className="text-lg text-gray-700 leading-relaxed mb-8 font-medium">
+          To execute this partnership effectively, SDRs and AEs must have clear ownership of their roles, while maintaining mutual commitment to pipeline success.
+        </p>
+        <div className="bg-white p-8 rounded-2xl border-l-8 border-[#003DA5] shadow-sm flex items-center gap-6">
+          <ArrowRightLeft className="text-[#003DA5] shrink-0" size={40} />
+          <p className="text-sm font-bold text-gray-800 leading-relaxed italic">
+            "SDRs focus on top-of-funnel pipeline creation and early development, while AEs focus on bottom-of-funnel activities – advancing, solving, and converting."
+          </p>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-6">
+         <div className="bg-[#252A2E] p-8 rounded-3xl text-center text-white shadow-xl">
+            <UserCheck className="mx-auto mb-4 text-[#FBAD26]" size={40} />
+            <p className="text-2xl font-black mb-1">SDR Core</p>
+            <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase italic">Pipeline Creation</p>
+         </div>
+         <div className="bg-[#003DA5] p-8 rounded-3xl text-center text-white shadow-xl">
+            <Briefcase className="mx-auto mb-4 text-[#FBAD26]" size={40} />
+            <p className="text-2xl font-black mb-1">AE Core</p>
+            <p className="text-[10px] font-bold text-blue-200 tracking-widest uppercase italic">Revenue Conversion</p>
+         </div>
+      </div>
+    </div>
+
+    {/* 1. CORE RESPONSIBILITIES */}
+    <div className="grid lg:grid-cols-2 gap-12 mb-24">
+      <div className="bg-white p-10 rounded-3xl border border-gray-100 shadow-xl">
+        <ResponsibilityList 
+          title="SDR Core Responsibilities"
+          color="#003DA5"
+          items={[
+            { label: "Pipeline Creation & Prospect Engagement", details: ["Conduct outbound prospecting within assigned territories and target accounts", "Respond quickly to inbound leads and route qualified opportunities appropriately", "Execute multi-touch outreach campaigns across calls, email, and social", "Identify and engage key stakeholders within target accounts"] },
+            { label: "Early-Stage Lead Qualification", details: ["Qualify prospects against defined frameworks and ICP criteria", "Conduct initial qualification to identify business problems and goals", "Surface key insights about organization priorities and buying triggers", "Determine whether or not the opportunity warrants AE engagement"] },
+            { label: "Account Research & Targeting", details: ["Identify accounts that align with the Ideal Customer Profile per industry", "Research organizations, industry context, and key stakeholders", "Support early-stage account penetration and multi-threading"] },
+            { label: "Meeting Preparation & Handoff", details: ["Schedule discovery meetings between qualified prospects and AEs", "Document research, qualification insights, and context in Salesforce DX", "Provide AEs with information needed to begin productive discovery conversations"] },
+            { label: "Pipeline Efficiency", details: ["Filter unqualified leads to prevent pipeline bottlenecks", "Handle early objections and nurture prospects not yet ready to engage", "Maintain accurate CRM documentation and activity tracking"] }
+          ]}
+        />
+      </div>
+      <div className="bg-white p-10 rounded-3xl border border-gray-100 shadow-xl">
+        <ResponsibilityList 
+          title="AE Core Responsibilities"
+          color="#252A2E"
+          items={[
+            { label: "Opportunity Advancement", details: ["Lead discovery calls to diagnose customer challenges and business objectives", "Align stakeholders around the customer’s problem and potential solution", "Progress opportunities through defined sales stages"] },
+            { label: "Strategic Customer Engagement", details: ["Deliver tailored product demonstrations and solution presentations", "Position solutions in the context of customer business outcomes", "Provide strategic guidance to customers throughout the evaluation process"] },
+            { label: "Solution Development", details: ["Build proposals and solution recommendations aligned to customer needs", "Collaborate internally to align technical, product, and pricing considerations", "Address customer questions, technical concerns, and objections"] },
+            { label: "Buying Process Navigation", details: ["Identify and manage buying committees and decision-makers", "Align champions, economic buyers, and influencers throughout the cycle", "Lead negotiations and guide opportunities to close"] },
+            { label: "Revenue Accountability", details: ["Maintain accurate opportunity data and forecasting", "Track deal progress and pipeline health", "Drive revenue through new business, expansion, and cross-sell"] },
+            { label: "SDR Development & Feedback", details: ["Provide structured feedback on meeting quality and qualification standards", "Partner with SDRs to improve targeting and outreach strategies", "Support SDR development through coaching and collaboration"] }
+          ]}
+        />
+      </div>
+    </div>
+
+    {/* 2. SHARED RESPONSIBILITIES */}
+    <div className="bg-slate-50 p-12 rounded-[3rem] border border-slate-200 shadow-inner mb-24">
+       <SubHeading title="Shared SDR & AE Responsibilities" icon={Handshake} />
+       <p className="text-sm text-gray-500 mb-10 italic">Successful SDR & AE partnerships operate as one unit – sharing ownership of the pipeline and its progression – instead of isolated responsibilities.</p>
+       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {[
+            { t: "Territory & Account Strategy", d: "Align on priority accounts and territory strategy. Collaborate on targeted account plans for Tier 1 / 'A' accounts. Identify new opportunities for expansion." },
+            { t: "Messaging & Market Alignment", d: "Align on messaging, positioning, and outreach strategy. Share market insights and customer signals. Ensure conversations reflect value messaging." },
+            { t: "Pipeline Ownership", d: "Maintain shared visibility and accountability for creation and progression. Position opportunities to move forward and identify gaps early." },
+            { t: "Opportunity Preparation", d: "Collaborate on meeting preparation for strategic opportunities. Align on discovery objectives and ensure conversations are purposeful." },
+            { t: "Feedback & Continuous Improvement", d: "Maintain open communication regarding lead quality. Share insights that improve qualification standards and refine the partnership." }
+          ].map((item, i) => (
+            <div key={i} className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:border-[#003DA5] transition-colors">
+              <h5 className="font-bold text-[#003DA5] mb-2 group-hover:text-black transition-colors">{item.t}</h5>
+              <p className="text-xs text-gray-500 leading-relaxed font-medium">{item.d}</p>
+            </div>
+          ))}
+       </div>
+    </div>
+
+    {/* 3. SDR ORGANIZATION AT TRIMBLE */}
+    <div className="bg-[#252A2E] rounded-[3rem] p-10 md:p-16 text-white mb-24 shadow-2xl relative overflow-hidden">
+       <div className="absolute top-0 right-0 p-8 opacity-5"><Network size={200}/></div>
+       <div className="relative z-10">
+          <SectionHeading title="The SDR Organization at Trimble" subtitle="Support Across Multiple Sales Motions" light />
+          <p className="text-gray-300 mb-12 max-w-3xl leading-relaxed italic">The nature of the SDR and AE partnership varies significantly depending on the motion. Inbound partnerships are more system-driven, while outbound, customer, and strategic motions require deeper collaboration.</p>
+          <div className="space-y-6">
+            {[
+              { t: "Inbound", f: "System-Driven model", d: "Qualifying and routing leads across the AEC portfolio – all industries and segments. Focus on speed, accuracy, and consistency. First touchpoint for many prospects." },
+              { t: "New Logo Outbound", f: "Acquisition focus", d: "Focus on MM and Enterprise acquisition. Close partnership with AEs to identify ICP accounts, build relationships across buying groups, and create net-new pipeline." },
+              { t: "Customer", f: "Expansion focus", d: "Driving expansion within an existing book of business through cross-sell, transformation, and migration. Identifying new use cases and uncovering whitespace." },
+              { t: "Strategic Customer", f: "Account-Based motion", d: "Support the organization’s most complex accounts. Surgical approach mapping buying committees, navigating parent-child structures, and driving deep penetration." }
+            ].map((org, i) => (
+              <div key={i} className="bg-white/5 p-8 rounded-3xl border border-white/10 flex flex-col md:flex-row md:items-center gap-6 hover:bg-white/10 transition-colors group">
+                <div className="md:w-1/4">
+                  <h4 className="text-xl font-bold text-white mb-1 leading-tight group-hover:text-[#FBAD26] transition-colors">{org.t}</h4>
+                  <p className="text-[#FBAD26] text-[10px] font-black uppercase tracking-widest">{org.f}</p>
+                </div>
+                <div className="md:w-3/4 border-l border-white/10 md:pl-8">
+                  <p className="text-sm text-gray-400 leading-relaxed font-medium">{org.d}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+       </div>
+    </div>
+
+    {/* 4. AMERICAS SALES TEAM STRUCTURE */}
+    <div className="mb-20">
+       <SectionHeading title="Americas Sales Team Structure" subtitle="Expertise Supported at Every Stage" />
+       <p className="text-lg text-gray-700 leading-relaxed mb-12 font-medium">
+          Revenue at Trimble is not driven by a single role or team. It is the result of a coordinated system where each part of the organization plays a distinct, but interconnected role.
+       </p>
+       
+       <div className="space-y-12">
+          <div className="grid lg:grid-cols-3 gap-8">
+             <div className="bg-white p-10 rounded-3xl shadow-lg border border-gray-100 flex flex-col">
+                <SubHeading title="Customer Sales Team" icon={Users} />
+                <p className="text-sm text-gray-600 leading-relaxed mb-6 flex-grow font-medium">
+                  Responsible for driving growth within existing accounts across all segments and verticals. Their primary focus is expanding Trimble’s footprint by identifying and executing cross-sell, transformation, migration, and upsell opportunities.
+                </p>
+                <p className="text-xs text-gray-500 mb-6 font-bold italic leading-relaxed">
+                  Customer sellers operate across the full product portfolio and work closely with Product Sellers to bring deep expertise into opportunities.
+                </p>
+                <div className="bg-blue-50 p-4 rounded-xl text-xs font-black text-[#003DA5] uppercase text-center">
+                  Goal: Connected Evolving Priorities to Capabilities
+                </div>
+             </div>
+
+             <div className="bg-white p-10 rounded-3xl shadow-lg border border-gray-100 flex flex-col">
+                <SubHeading title="New Logo & ERP Teams" icon={Target} />
+                <div className="space-y-6 flex-grow">
+                   <div>
+                      <p className="font-bold text-sm text-[#003DA5] mb-2 uppercase tracking-tighter">ERP Product Team (MM & Enterprise)</p>
+                      <p className="text-xs text-gray-600 leading-relaxed font-medium">
+                        Specializes in driving ERP adoption across Trimble’s customer base. Partner with owners in non-ERP verticals to execute ERP opportunities within existing accounts.
+                      </p>
+                   </div>
+                   <div className="pt-4 border-t border-gray-50">
+                      <p className="font-bold text-sm text-[#003DA5] mb-2 uppercase tracking-tighter">New Logo Team (SMB, MM, ENT)</p>
+                      <p className="text-xs text-gray-600 leading-relaxed font-medium">
+                        Responsible for acquiring new customers and net-new pipeline. Focus on prospect accounts not yet using Trimble. Partner with Product Sellers for early-stage expert positioning.
+                      </p>
+                   </div>
+                </div>
+             </div>
+
+             <div className="bg-white p-10 rounded-3xl shadow-lg border border-gray-100 flex flex-col">
+                <SubHeading title="Product Sales Team" icon={Briefcase} />
+                <p className="text-sm text-gray-600 leading-relaxed mb-6 flex-grow font-medium">
+                  Provides specialized expertise across Trimble’s solution portfolio and supports both customer and new logo motions in three primary ways:
+                </p>
+                <ul className="space-y-4 mb-6">
+                  <li className="flex gap-3 items-start text-xs text-gray-700 font-bold italic">
+                    <CheckCircle2 size={16} className="text-[#FBAD26] shrink-0" />
+                    Supporting existing product customers where deeper expertise is required to expand usage.
+                  </li>
+                  <li className="flex gap-3 items-start text-xs text-gray-700 font-bold italic">
+                    <CheckCircle2 size={16} className="text-[#FBAD26] shrink-0" />
+                    Driving expansion within Customer accounts by integrated effective solutions.
+                  </li>
+                  <li className="flex gap-3 items-start text-xs text-gray-700 font-bold italic">
+                    <CheckCircle2 size={16} className="text-[#FBAD26] shrink-0" />
+                    Supporting New Logo opportunities by bringing technical depth to early-stage conversations.
+                  </li>
+                </ul>
+             </div>
+          </div>
+          <div className="p-8 bg-slate-50 border-2 border-dashed border-gray-200 rounded-3xl text-center">
+             <p className="text-sm font-black text-gray-400 uppercase tracking-widest mb-2">The Integrated Workflow</p>
+             <p className="text-lg font-bold text-gray-900 italic">SDRs create/qualify &rarr; AEs advance/convert &rarr; Product Sellers align expertise</p>
+          </div>
+       </div>
+    </div>
+  </div>
+);
+
+const RulesSection = () => (
+  <div className="space-y-10 animate-in fade-in duration-500">
+    <SectionHeading title="Rules of Engagement" subtitle="Operational Standards" />
+    
+    <p className="text-lg text-gray-700 leading-relaxed max-w-4xl mb-12">
+      The following Rules of Engagement establish how SDRs and AEs collaborate, communicate, and maintain accountability across every stage of the sales process. Execution is defined by how teams operate across account ownership, lead routing, and opportunity handoff.
+    </p>
+
+    <div className="grid md:grid-cols-3 gap-8 mb-20">
+      <ROECard 
+        icon={Building2} 
+        title="Account Ownership" 
+        desc="How accounts are assigned, verified, and managed to ensure ownership." 
+        items={["Verified in Salesforce DX", "Territory-based alignment", "Named account protocols"]}
+      />
+      <ROECard 
+        icon={Split} 
+        title="Lead Routing" 
+        desc="How inbound and outbound leads are routed correctly to owners." 
+        items={["Industry & Segment logic", "GAR verification", "ROO (Rules of Ownership)"]}
+      />
+      <ROECard 
+        icon={ArrowRightLeft} 
+        title="Professional Handoff" 
+        desc="How qualified opportunities transition from SDR to AE with context." 
+        items={["Qualification verification", "Intro emails", "Post-meeting feedback"]}
+      />
+    </div>
+
+    {/* ACCOUNT OWNERSHIP DETAILS */}
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-20">
+      <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-slate-50">
+          <div>
+            <h3 className="text-xl font-bold text-gray-900">Coverage Models</h3>
+            <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">Ownership & Alignment</p>
+          </div>
+          <ShieldCheck className="text-[#003DA5]" size={32} />
+      </div>
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100">
+        {[
+          { title: "Customer SDR", type: "Territory-Based", focus: "ARR & License Count", desc: "Supports AEs in specific regions identifying cross-sell." },
+          { title: "Strategic SDR", type: "Named Account", focus: "High-Value Key Accounts", desc: "Direct AE support for specific high-stakes named entities." },
+          { title: "Inbound SDR", type: "Routing-Based", focus: "All AECO Products", desc: "No specific account ownership; routes via segment/GAR logic." },
+          { title: "New Logo SDR", type: "Industry-Aligned", focus: "Net-New ICP Accounts", desc: "Mid-Market/Enterprise focus within specific industry verticals." }
+        ].map((model, i) => (
+          <div key={i} className="p-6">
+            <p className="text-[10px] font-bold text-[#003DA5] mb-1">{model.type}</p>
+            <h4 className="font-bold text-gray-900 mb-2">{model.title}</h4>
+            <p className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded inline-block mb-3 uppercase font-black">{model.focus}</p>
+            <p className="text-xs text-gray-600 leading-relaxed">{model.desc}</p>
+          </div>
+        ))}
+      </div>
+      <div className="p-6 bg-blue-900 text-white">
+        <div className="flex gap-8 items-center text-xs">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#FBAD26]"></div>
+            <span className="font-bold">Ownership Rule:</span> No two AE territory codes should ever exist on a single account.
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#FBAD26]"></div>
+            <span className="font-bold italic">Verification:</span> Always search Parent/Child and Prime/Subprime before outreach.
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    {/* HANDOFF & NO-SHOW PROCESS */}
+    <div className="grid lg:grid-cols-2 gap-12 mb-24">
+      <div>
+        <SectionHeading title="Handoff Expectations" subtitle="The Hand-off Lifecycle" />
+        <div className="space-y-4">
+          <div className="flex gap-4 p-4 bg-white rounded-lg border border-gray-100">
+            <div className="w-8 h-8 rounded-full bg-blue-100 text-[#003DA5] flex items-center justify-center font-bold text-sm shrink-0">1</div>
+            <div>
+              <p className="font-bold text-sm">Meeting Booking</p>
+              <p className="text-xs text-gray-500">SDR reaches out via Google Chat with Opp link + context. Introduction email sent to prospect + AE + Product Seller.</p>
+            </div>
+          </div>
+          <div className="flex gap-4 p-4 bg-white rounded-lg border border-gray-100">
+            <div className="w-8 h-8 rounded-full bg-blue-100 text-[#003DA5] flex items-center justify-center font-bold text-sm shrink-0">2</div>
+            <div>
+              <p className="font-bold text-sm">Review & Prep</p>
+              <p className="text-xs text-gray-500">AE reviews context. If info is missing, AE must address with SDR ASAP before the call. No re-starting qualification!</p>
+            </div>
+          </div>
+          <div className="flex gap-4 p-4 bg-white rounded-lg border border-gray-100">
+            <div className="w-8 h-8 rounded-full bg-blue-100 text-[#003DA5] flex items-center justify-center font-bold text-sm shrink-0">3</div>
+            <div>
+              <p className="font-bold text-sm">Post-Call Ownership</p>
+              <p className="text-xs text-gray-500">AE follow-up within 24 hours. Move Opp to Discovery within 48 hours. Feedback Scorecard logged in SFDX.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-[#252A2E] rounded-xl p-8 text-white">
+        <div className="flex items-center gap-3 mb-6">
+          <AlertTriangle className="text-[#FBAD26]" size={28} />
+          <h3 className="text-xl font-bold">No-Show Process</h3>
+        </div>
+        <div className="relative space-y-8 border-l-2 border-white/10 ml-2 pl-8">
+          <div className="relative">
+            <div className="absolute -left-[41px] top-1 w-4 h-4 rounded-full bg-[#FBAD26]"></div>
+            <h4 className="font-bold text-sm text-[#FBAD26] mb-1">Same Day</h4>
+            <p className="text-xs text-gray-400">AE calls prospect + sends follow-up email. AE notifies SDR immediately. SDR joins early to verify participants.</p>
+          </div>
+          <div className="relative">
+            <div className="absolute -left-[41px] top-1 w-4 h-4 rounded-full bg-gray-500"></div>
+            <h4 className="font-bold text-sm mb-1">Next Day</h4>
+            <p className="text-xs text-gray-400">SDR calls & emails with 2-3 new time options, copying AE and Product Seller.</p>
+          </div>
+          <div className="relative">
+            <div className="absolute -left-[41px] top-1 w-4 h-4 rounded-full bg-gray-500"></div>
+            <h4 className="font-bold text-sm mb-1">48 Hours Later</h4>
+            <p className="text-xs text-gray-400">SDR sends value-add resource (case study/article). Update SFDX activity log with outreach attempts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* SLAs & COMMUNICATION */}
+    <div className="mb-24">
+       <SectionHeading title="Communication & SLAs" subtitle="The Responsiveness Standard" />
+       <div className="grid md:grid-cols-4 gap-4 text-center">
+         <div className="bg-white p-6 rounded-xl border-t-4 border-[#003DA5] shadow-sm">
+           <Clock className="mx-auto mb-3 text-[#003DA5]" size={32} />
+           <p className="text-2xl font-black mb-1">24h</p>
+           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">AE Follow-Up SLA</p>
+         </div>
+         <div className="bg-white p-6 rounded-xl border-t-4 border-[#003DA5] shadow-sm">
+           <MessageCircle className="mx-auto mb-3 text-[#003DA5]" size={32} />
+           <p className="text-2xl font-black mb-1">48h</p>
+           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Post-Meeting Feedback</p>
+         </div>
+         <div className="bg-white p-6 rounded-xl border-t-4 border-[#FBAD26] shadow-sm">
+           <Calendar className="mx-auto mb-3 text-[#FBAD26]" size={32} />
+           <p className="text-2xl font-black mb-1">30d</p>
+           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">First Client Meeting Window</p>
+         </div>
+         <div className="bg-white p-6 rounded-xl border-t-4 border-red-500 shadow-sm">
+           <RotateCcw className="mx-auto mb-3 text-red-500" size={32} />
+           <p className="text-2xl font-black mb-1">60d</p>
+           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Idle Opp Disqualification</p>
+         </div>
+       </div>
+    </div>
+
+    {/* FEEDBACK TEMPLATES */}
+    <div className="mb-24 bg-slate-100 rounded-3xl p-10">
+       <div className="grid lg:grid-cols-2 gap-12">
+         <div>
+           <h3 className="text-2xl font-black mb-4">Post-Meeting Feedback</h3>
+           <p className="text-gray-600 text-sm mb-8">
+             Feedback should be specific, structured, and actionable. Use these templates to ensure SDR development and pipeline accuracy.
+           </p>
+           <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
+              <h4 className="font-bold text-[#003DA5] flex items-center gap-2 mb-4">
+                <Star size={18} /> Opportunity Progression
+              </h4>
+              <p className="text-xs text-gray-700 leading-relaxed mb-4">
+                If the opp doesn't move forward but meets qualification standards, set Loss Reason to <span className="font-bold text-green-600 italic">Sales Disqualified Opportunity</span> to ensure the SDR receives SQO credit.
+              </p>
+              <div className="bg-blue-50 p-3 rounded text-[11px] border border-blue-100">
+                <strong>Score 1–5 for:</strong> Meeting Quality, Qualification (BANT), Notes/Context, and ICP/Account Fit.
+              </div>
+           </div>
+         </div>
+         <div>
+            <FeedbackTemplate 
+              type="google"
+              title="Google Chat Post-Meeting"
+              content={`Account: [NAME]\nOverall: /5\nQualification: /5\nNotes Quality: /5\nICP Fit: /5\nOutcome: [Moved to Disc/Follow-up/Disq]\n\nWhat worked:\nImprove:`}
+            />
+            <FeedbackTemplate 
+              type="sfdx"
+              title="Salesforce DX Template"
+              content={`1. Meeting Quality Rating (Overall)\n2. Qualification Quality (Need, Auth, Timing)\n3. Notes & Context Quality (Pain points, Next Steps)\n4. ICP / Account Fit\n5. Meeting Outcome\n6. Additional Context / Coaching Notes`}
+            />
+         </div>
+       </div>
+    </div>
+
+    {/* CRM HYGIENE & DATA INTEGRITY */}
+    <div className="mb-24">
+       <SectionHeading title="CRM Hygiene & Data" subtitle="If it's not in the CRM, it didn't happen." />
+       <div className="grid md:grid-cols-2 gap-12">
+         <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+           <h4 className="font-bold text-gray-900 mb-6 flex items-center gap-2 uppercase tracking-widest text-xs">
+             <ClipboardList className="text-[#003DA5]" /> Required Fields (Pre-Handoff)
+           </h4>
+           <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+              {['Bill-to Contact', 'Ship-to Contact', 'Payment Terms (Net 30)', 'Vertical', 'Primary Industry', 'Product of Interest', 'Account Segment', 'Market Segment'].map(field => (
+                <div key={field} className="flex items-center gap-2">
+                  <CheckSquare size={14} className="text-[#FBAD26]" />
+                  <span className="text-xs text-gray-700 font-medium">{field}</span>
+                </div>
+              ))}
+           </div>
+           <div className="mt-10 p-4 bg-slate-50 border border-dashed border-gray-300 rounded">
+              <p className="text-[10px] font-bold text-[#003DA5] uppercase mb-1">Opportunity Naming Convention</p>
+              <p className="text-sm font-mono text-gray-600">Company – Size – Product – Quarter – State</p>
+              <p className="text-[10px] text-gray-400 mt-1 italic">Ex: Cascade ironworks - MMNL - Tekla - Q2 - OR</p>
+           </div>
+         </div>
+         
+         <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+           <h4 className="font-bold text-gray-900 mb-6 flex items-center gap-2 uppercase tracking-widest text-xs">
+             <FileText className="text-[#003DA5]" /> Required Notes Format
+           </h4>
+           <div className="bg-slate-900 p-6 rounded-lg font-mono text-[11px] text-white/80 overflow-y-auto max-h-[300px]">
+             <p className="text-[#FBAD26] mb-2 font-bold">// Qualification Call Summary</p>
+             <p>Date: [MM/DD/YYYY]</p>
+             <p>BANT (Budget, Need, Auth, Timing):</p>
+             <p className="pl-4">N: [Key Pain Points]</p>
+             <p className="pl-4">A: [Stakeholders]</p>
+             <p>Primary Interest (Products):</p>
+             <p>Users (Scope):</p>
+             <p>Current Software:</p>
+             <p>Business Need (PAIN):</p>
+             <p>Next Steps: [Agreed Outcome]</p>
+           </div>
+         </div>
+       </div>
+    </div>
+
+    {/* MANAGER RESPONSIBILITIES - NEW SUBSECTION */}
+    <div className="mb-24">
+       <div className="bg-white p-8 rounded-2xl border-l-8 border-[#003DA5] shadow-sm mb-12">
+          <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
+             <div className="p-4 bg-blue-50 rounded-xl text-[#003DA5]">
+                <Users size={48} />
+             </div>
+             <div>
+                <h3 className="text-2xl font-black text-[#252A2E] mb-2 uppercase tracking-tight">Manager Responsibilities</h3>
+                <p className="text-gray-600 leading-relaxed italic">
+                  How you help us reinforce our ROE. Frontline managers play a critical role in ensuring these Rules of Engagement are understood and executed. They are responsible for driving adoption, reinforcing behaviors, and intervening when breakdowns impact performance.
+                </p>
+             </div>
+          </div>
+       </div>
+
+       <div className="grid lg:grid-cols-3 gap-6 mb-16">
+          <ManagerActivityCard 
+             title="Pipeline Reviews"
+             icon={Search}
+             items={["SAO → SQO → Won Conversion", "Stage progression velocity", "Drop-off/Qualification gaps"]}
+             focus="Are specific SDR/AE pairs outperforming? Why? Are segments producing low-quality pipeline?"
+          />
+          <ManagerActivityCard 
+             title="1:1s (SDR + AE)"
+             icon={UserPlus}
+             items={["Target account alignment", "Clarity of meeting objectives", "Quality of feedback exchanged"]}
+             focus="Spot early signs of breakdown: Lack of trust, communication gaps, or 'qualified' definition misalignment."
+          />
+          <ManagerActivityCard 
+             title="Forecast Calls"
+             icon={TrendingUp}
+             items={["Categorization accuracy", "Challenge inflated opportunities", "Connect outcomes to behavior"]}
+             focus="Was this a qualification issue? Was there a breakdown in handoff or follow-up?"
+          />
+       </div>
+
+       {/* COACHING FOCUS MATRIX */}
+       <div className="bg-[#252A2E] rounded-3xl p-10 md:p-16 text-white mb-20 shadow-2xl relative overflow-hidden">
+          <div className="relative z-10">
+             <div className="mb-12">
+                <SectionHeading title="Coaching Focus Areas" subtitle="Driving Rep Development" light />
+             </div>
+             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {[
+                  { title: "Qualification Quality", focus: "NEED & AUTHORITY", desc: "Are SDRs identifying real pain? Are AEs advancing on clear signals?" },
+                  { title: "Handoff Effectiveness", focus: "CONTEXT & MOMENTUM", desc: "Is context actionable? Are AEs building on discovery or restarting?" },
+                  { title: "Feedback Quality", focus: "SPECIFIC & ACTIONABLE", desc: "Is AE feedback direct? Are SDRs applying it to improve?" },
+                  { title: "Collaboration", focus: "TEAM VS SILO", desc: "Are they aligned on strategy and messaging as one unit?" }
+                ].map((area, i) => (
+                  <div key={i} className="group">
+                     <div className="text-[#FBAD26] text-3xl font-black mb-2 opacity-50 group-hover:opacity-100 transition-opacity">0{i+1}</div>
+                     <h4 className="font-bold text-white mb-1 uppercase tracking-tighter">{area.title}</h4>
+                     <p className="text-[#FBAD26] text-[10px] font-black tracking-widest mb-4">{area.focus}</p>
+                     <p className="text-xs text-gray-400 leading-relaxed">{area.desc}</p>
+                  </div>
+                ))}
+             </div>
+             <div className="mt-12 p-6 bg-white/5 border border-white/10 rounded-xl flex items-center gap-4">
+                <div className="p-2 bg-[#FBAD26] rounded text-[#252A2E]">
+                   <Award size={20} />
+                </div>
+                <p className="text-sm font-medium italic text-gray-300">
+                   "Managers model behavior through data-driven decision making, direct communication, and cross-functional alignment."
+                </p>
+             </div>
+          </div>
+       </div>
+    </div>
+
+    {/* ESCALATION & RESOLUTION */}
+    <div className="mb-16">
+      <SectionHeading title="Escalation & Resolution" subtitle="Resolving Friction Fast" />
+      <div className="grid lg:grid-cols-3 gap-8">
+         <div className="lg:col-span-2 space-y-6">
+           <p className="text-gray-700 leading-relaxed italic">
+             "Escalation should be considered when issues are recurring, impacting pipeline quality, or creating friction that cannot be resolved through normal working cadence."
+           </p>
+           <div className="grid md:grid-cols-2 gap-4">
+              {[
+                { title: "Quality Patterns", desc: "Pattern of low-quality meetings lacking need/auth/ICP fit." },
+                { title: "SLA Breakdowns", desc: "Delayed follow-up (>24h) or frequent AE no-shows/reschedules." },
+                { title: "Ownership Gaps", desc: "Prospecting into active opps or routing inaccuracies." },
+                { title: "Systemic Friction", desc: "Repeated disconnect between SDR and AE expectations." }
+              ].map((item, i) => (
+                <div key={i} className="p-4 bg-red-50 border-l-4 border-red-500 rounded">
+                  <h5 className="text-xs font-bold text-red-700 mb-1">{item.title}</h5>
+                  <p className="text-[11px] text-red-600">{item.desc}</p>
+                </div>
+              ))}
+           </div>
+         </div>
+         
+         <div className="bg-white p-8 rounded-2xl border-2 border-[#003DA5] relative">
+            <h4 className="font-bold text-center mb-6 uppercase tracking-tighter">Resolution Path</h4>
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-full bg-[#FBAD26] p-3 text-center rounded font-bold text-xs shadow-md">
+                Leadership Intervention
+              </div>
+              <div className="w-5/6 bg-blue-100 p-3 text-center rounded font-bold text-xs text-[#003DA5] border border-blue-200">
+                Manager Alignment
+              </div>
+              <div className="w-2/3 bg-[#003DA5] p-3 text-center rounded font-bold text-xs text-white shadow-lg">
+                Direct Peer Alignment
+              </div>
+            </div>
+            <div className="mt-8 pt-6 border-t border-gray-100">
+              <p className="text-[10px] text-gray-400 font-bold uppercase mb-2">Key Principles</p>
+              <ul className="space-y-1 text-[10px] text-gray-500">
+                <li>• Assume Positive Intent</li>
+                <li>• Be Data-Driven (Salesforce/Gong)</li>
+                <li>• Address Patterns, Not Incidents</li>
+                <li>• Prioritize Resolution Speed</li>
+              </ul>
+            </div>
+         </div>
+      </div>
+    </div>
+  </div>
+);
+
+const HandoffSection = () => {
+  const [copied, setCopied] = useState(false);
+  const scriptRef = useRef(null);
+
+  const copyToClipboard = () => {
+    if (scriptRef.current) {
+      const range = document.createRange();
+      range.selectNode(scriptRef.current);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="space-y-16 animate-in fade-in duration-500">
+      <div>
+        <SectionHeading title="Qualification & Handoff Standards" subtitle="Quality Over Activity" />
+        <div className="bg-blue-50 p-10 rounded-[2.5rem] border-l-8 border-[#003DA5] shadow-sm mb-16">
+          <p className="text-gray-700 leading-relaxed font-medium text-lg mb-8">
+            One of the most common sources of friction between SDRs and AEs is not effort, it’s misalignment. When “qualified” means different things to different people, it leads to inconsistent pipeline quality, missed expectations, and breakdowns in trust. This section on qualification and handoff expectations exists to eliminate that ambiguity.
+          </p>
+          <div className="pt-8 border-t border-[#003DA5]/10">
+            <p className="text-[#003DA5] font-black uppercase text-xs tracking-widest mb-3">Our goal is simple:</p>
+            <p className="text-2xl font-bold text-gray-900 italic">
+              Create a shared, consistent definition of qualification that ensures every opportunity entering the pipeline is actionable, credible, and worth an AE’s time.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="grid lg:grid-cols-2 gap-16 items-start mb-20">
+        <div className="bg-white p-10 rounded-3xl shadow-xl border border-gray-100">
+            <h3 className="text-2xl font-black mb-6 flex items-center gap-3">
+              <Anchor className="text-[#003DA5]" /> The Qualification Anchor
+            </h3>
+            <div className="bg-[#003DA5] text-white p-8 rounded-2xl shadow-lg border-b-8 border-[#FBAD26] mb-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-5"><Target size={120} /></div>
+              <h4 className="font-black uppercase tracking-widest text-xs mb-6 text-[#FBAD26]">Primary Focus</h4>
+              <div className="space-y-6 relative z-10 font-bold italic">
+                 <div>
+                    <p className="font-black text-lg mb-1 underline decoration-[#FBAD26] underline-offset-4 uppercase tracking-tighter">Need</p>
+                    <p className="text-sm text-blue-100 leading-relaxed font-medium">Identify relevant business problem or initiative that aligns with Trimble’s value. Goes beyond surface-level interest; understand why it matters and what happens if they don’t act.</p>
+                 </div>
+                 <div>
+                    <p className="font-black text-lg mb-1 underline decoration-[#FBAD26] underline-offset-4 uppercase tracking-tighter">Authority</p>
+                    <p className="text-sm text-blue-100 leading-relaxed font-medium">Validate that the right stakeholders are involved. Not about titles alone, but about influence over buying and access to decision-makers.</p>
+                 </div>
+              </div>
+            </div>
+            <div className="bg-white border-2 border-[#003DA5] p-8 rounded-2xl">
+              <h4 className="font-black uppercase tracking-widest text-xs mb-6 text-[#003DA5]">Secondary Focus</h4>
+              <div className="grid md:grid-cols-2 gap-8 text-[11px] font-bold text-gray-500 uppercase tracking-tighter italic leading-relaxed">
+                 <div><p className="text-black mb-2 font-black uppercase underline tracking-[0.2em]">Budget</p><p>Confirm buying motion exists (funding ownership, planning cycles, active initiatives).</p></div>
+                 <div><p className="text-black mb-2 font-black uppercase underline tracking-[0.2em]">Timeline</p><p>Identify driver (project milestones, renewal cycles). Ensure the urgency is real.</p></div>
+              </div>
+            </div>
+        </div>
+
+        <div className="space-y-8 h-full">
+           <div className="bg-slate-50 p-10 rounded-3xl border border-slate-200 h-full flex flex-col">
+              <h3 className="text-xl font-bold mb-8 italic uppercase tracking-tighter">From SAO to SQO</h3>
+              <div className="space-y-6 flex-grow">
+                 <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <p className="text-xs font-black text-green-600 uppercase mb-2">Sales Accepted (SAO)</p>
+                    <p className="text-11px text-gray-600 leading-relaxed font-bold italic">Qualified meeting with Need/Authority + Context in SFDX. AE follow-up required in 24h.</p>
+                 </div>
+                 <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <p className="text-xs font-black text-[#FBAD26] uppercase mb-2">Sales Qualified (SQO)</p>
+                    <p className="text-11px text-gray-600 leading-relaxed font-bold italic">Advanced by AE to Discovery. CBI (Critical Business Issues) and success factors confirmed.</p>
+                 </div>
+              </div>
+              <div className="mt-10 bg-[#252A2E] text-white p-8 rounded-2xl shadow-lg">
+                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FBAD26] mb-6 border-b border-white/10 pb-4 text-center italic">The SDR Self-Check</p>
+                 <ul className="space-y-4 text-xs font-bold uppercase tracking-tight italic">
+                    <li className="flex gap-3 items-start"><CheckSquare size={18} className="text-[#FBAD26] shrink-0 mt-0.5"/> Would an AE feel confident taking this meeting?</li>
+                    <li className="flex gap-3 items-start"><CheckSquare size={18} className="text-[#FBAD26] shrink-0 mt-0.5"/> Does the customer have a reason to act now?</li>
+                    <li className="flex gap-3 items-start"><CheckSquare size={18} className="text-[#FBAD26] shrink-0 mt-0.5"/> Can this meeting progress to Discovery or stall?</li>
+                 </ul>
+              </div>
+           </div>
+        </div>
+      </div>
+
+      <div className="mb-24">
+         <h3 className="text-2xl font-black mb-10 text-center uppercase tracking-tighter">Handoff in Practice: What Good Looks Like</h3>
+         <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-2xl overflow-hidden">
+            <div className="grid md:grid-cols-2 divide-x divide-gray-100">
+               <div className="p-10 bg-white">
+                  <div className="flex items-center gap-3 text-green-600 mb-8 uppercase font-black text-sm tracking-widest underline decoration-2">
+                    <CheckCircle2 size={24}/> Strong Handoff (The Goal)
+                  </div>
+                  <ul className="space-y-4 text-xs font-bold text-gray-700">
+                     <li>• Customer need is defined with context (problem, impact, urgency)</li>
+                     <li>• Authority path is understood (decision-makers involved)</li>
+                     <li>• SDR provides a concise, relevant recap tied to business outcomes</li>
+                     <li>• All required CRM fields are completed accurately</li>
+                     <li>• AE receives context ahead of meeting and can prepare strategically</li>
+                     <li>• Customer experiences a seamless transition (no repetition needed)</li>
+                     <li>• SDR introduces AE with credibility and intention</li>
+                     <li>• Opportunity has a realistic path forward (aligned to timeline)</li>
+                  </ul>
+               </div>
+               <div className="p-10 bg-slate-50/50">
+                  <div className="flex items-center gap-3 text-red-500 mb-8 uppercase font-black text-sm tracking-widest underline decoration-2">
+                    <XCircle size={24}/> Poor Handoff (To Avoid)
+                  </div>
+                  <ul className="space-y-4 text-xs font-bold text-gray-400 italic">
+                     <li>• Vague or surface-level interest ("just wants to learn more")</li>
+                     <li>• No clarity on who is involved in the decision</li>
+                     <li>• Notes are incomplete, generic, or missing</li>
+                     <li>• Missing or incorrect CRM data</li>
+                     <li>• Meeting feels like a generic intro with no direction</li>
+                     <li>• AE goes into the meeting cold</li>
+                     <li>• Customer has to repeat everything to the AE</li>
+                     <li>• Handoff feels transactional or rushed</li>
+                     <li>• No feedback loop - SDR doesn't know what worked</li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-12 mb-20">
+         <div className="space-y-4">
+            <div className="bg-[#003DA5] p-4 text-white font-black rounded-2xl text-center uppercase tracking-widest text-xs shadow-lg flex items-center justify-center gap-3">
+              <Calendar size={18}/> Step 1: Invite Agenda Templates
+            </div>
+            <FeedbackTemplate 
+              type="google" title="Exact wording for Calendar Invite"
+              content={`Example Google Meet Agenda #1\nMeeting Title: Trimble <> PROSPECT COMPANY NAME\nDescription:\nThe Trimble team is excited to meet with you. A detailed agenda will be provided during the meeting to guide the conversation, but to help you prepare, here's what you can expect:\n- Open dialogue about [PRODUCT]’s features\n- Review of your design processes and how Trimble can better support you\n- Review licensing options to ensure you’re supported by the right plan\n- Advantages of establishing a business account\n- Address any outstanding questions\nPlease let us know if we’re missing anything and we’ll be sure to address it. Thanks again!\n\n------------------\nExample Google Meet Agenda #2\nIn this meeting, we’ll explore how Trimble’s capabilities can help streamline and enhance your construction management workflows.\nAgenda:\n- Welcome & Introductions\n- Overview of Trimble Solutions\n- Coordinating a Demo & Discussing Next Steps`}
+            />
+         </div>
+         <div className="space-y-4">
+            <div className="bg-[#FBAD26] p-4 text-black font-black rounded-2xl text-center uppercase tracking-widest text-xs shadow-lg flex items-center justify-center gap-3">
+              <Mail size={18}/> Step 2: Introduction Emails
+            </div>
+            <FeedbackTemplate 
+              type="email" title="Exact wording for AE Introduction"
+              content={`Email Example #1\nSubject: Great Speaking With You! Introducing [Trimble Rep Name] & [Product Specialist Name] from Trimble\n\nHi [Prospect's First Name],\nIt was a pleasure speaking with you today! As discussed, I wanted to introduce you to a couple of folks from our team who can help take the conversation further:\n[Trimble Rep Name], your Trimble Account Representative – here to support you with anything related to your broader technology goals.\n[Product Specialist Name], our [Product Name] expert – available to go deeper on workflows and technical questions.\n[Insert 1-2 sentences summarizing what was discussed].\nNext steps: I have scheduled a call for the three of you on [DATE].`}
+            />
+         </div>
+      </div>
+
+      <div className="bg-white p-10 rounded-3xl border border-gray-100 shadow-xl mb-20">
+        <SubHeading title="Step 3: Transfer Context & Feedback" icon={ArrowRightLeft} />
+        <div className="grid lg:grid-cols-2 gap-8">
+            <FeedbackTemplate
+              type="google" title="Google Chat / Internal Sync"
+              content={`Hi [AE]! I just booked a meeting with [PROSPECT NAME/TITLE] at [COMPANY] and added you to it. You’ll find the call notes here under this opp [ADD LINK TO OPP IN SFDX], but I’ll paste them here as well so you have the context right away. If you have any questions about the call notes or need anything else prior to the meeting, let me know.`}
+            />
+            <FeedbackTemplate
+              type="email" title="AE Follow-up (Prior to Meeting)"
+              content={`Hi [Prospect Name],\n\nIt’s great to meet you virtually, and thanks again for connecting with [SDR Name]. I’ve spoken with them and reviewed their notes from your conversation, and am looking forward to learning more about your goals around [insert relevant pain point or initiative].\n\nAs your Account Executive here at Trimble, my role is to help you evaluate the best path forward based on your current workflows, priorities, and desired outcomes.\n\nAhead of our meeting on [date/time], I wanted to share a quick agenda so you know what to expect:\n\nProposed Agenda\n- Brief introductions and context-setting\n- Review of your current workflows and goals\n- Discussion of key challenges and opportunities\n- Overview of relevant Trimble solutions\n- Align on next steps and potential path forward\n\nIf there’s anything specific you’d like to make sure we cover, feel free to let me know in advance.\n\nLooking forward to speaking with you on [date/time].\n\nBest regards,\n[AE Full Name]`}
+            />
+        </div>
+      </div>
+
+      <div className="bg-slate-50 p-10 rounded-3xl border border-slate-200 shadow-inner mb-20">
+        <SubHeading title="Step 4: Closing the Loop (AE to SDR Feedback)" icon={RefreshCw} />
+        <p className="text-sm text-gray-500 mb-8 italic font-medium">To maintain high-quality pipeline, AEs are expected to provide feedback within 48 hours of the meeting to the SDR partner.</p>
+        <div className="grid lg:grid-cols-2 gap-8">
+            <FeedbackTemplate
+              type="google" title="Internal Feedback (Positive)"
+              content={`Hi [SDR Name]! Great job on the [COMPANY] call today. The context you provided on their struggles with [PAIN POINT] allowed us to jump straight into discovery. They were really impressed that we were already aligned on their business needs. Meeting moved to SQO!`}
+            />
+            <FeedbackTemplate
+              type="google" title="Internal Feedback (Constructive)"
+              content={`Hi [SDR Name]. On the [COMPANY] call today, we found that [CONTACT NAME] wasn't actually the decision-maker for this initiative. In the future, can we try to multi-thread more during your initial outreach to ensure we have the [TITLE] involved before the handoff? I've disqualified the opp for now but let's keep an eye on them for Q4.`}
+            />
+        </div>
+      </div>
+
+      {/* BOAT FRAMEWORK SECTION */}
+      <div id="boat-framework" className="bg-[#003DA5] rounded-[3rem] p-10 md:p-20 text-white relative overflow-hidden shadow-2xl mb-20">
+         <div className="absolute top-0 right-0 p-12 opacity-10"><Compass size={300}/></div>
+         
+         <div className="relative z-10 max-w-4xl mx-auto">
+            {/* 1. WHY THE BOAT FRAMEWORK */}
+            <div className="mb-16">
+               <h3 className="text-4xl font-black mb-8 italic uppercase tracking-tighter">The Handoff Introduction</h3>
+               <div className="bg-white/10 p-8 rounded-[2.5rem] border border-white/20 backdrop-blur-md">
+                  <p className="text-lg leading-relaxed font-medium mb-6">
+                    <strong className="text-[#FBAD26]">Best practice:</strong> In order to provide a seamless transition to the AE, it’s highly recommended for an SDR to join the beginning of the Discovery call to provide context and reinforce qualification.
+                  </p>
+                  <p className="text-blue-100 text-sm italic leading-relaxed mb-6">
+                    A strong handoff creates a positive customer experience, builds credibility with the prospect, and prevents the conversation from restarting.
+                  </p>
+                  <div className="h-px bg-white/20 mb-6"></div>
+                  <p className="text-sm font-bold uppercase tracking-widest text-[#FBAD26] mb-4">In your introduction, you will cover:</p>
+                  <div className="grid md:grid-cols-2 gap-4">
+                     {["Conversation Background", "Discovery Objective", "Timeframe / Hard Stops", "Account Executive Intro"].map((point, i) => (
+                       <div key={i} className="flex items-center gap-3 bg-black/20 p-3 rounded-xl border border-white/5">
+                         <CheckCircle2 size={16} className="text-[#FBAD26]"/>
+                         <span className="text-xs font-bold">{point}</span>
+                       </div>
+                     ))}
+                  </div>
+               </div>
+            </div>
+
+            {/* 2. THE BOAT ACRONYM GRAPHIC */}
+            <div className="mb-20">
+               <div className="text-center mb-10">
+                  <span className="bg-[#FBAD26] text-black text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest italic shadow-lg">Strategic Framework</span>
+                  <h4 className="text-2xl font-black mt-4 uppercase">The BOAT Framework</h4>
+               </div>
+               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  {[
+                    { l: "B", t: "Background", d: "Recap the earlier conversation and key triggers." },
+                    { l: "O", t: "Objective", d: "Define achievement for today's call." },
+                    { l: "A", t: "Agenda", d: "Flow of the next 30-60 minutes." },
+                    { l: "T", t: "Timeline", d: "Confirm hard stops or constraints." }
+                  ].map(item => (
+                    <div key={item.l} className="bg-white/10 p-6 rounded-3xl border border-white/10 hover:bg-white/20 transition-all text-center group">
+                       <div className="w-14 h-14 rounded-2xl bg-[#FBAD26] text-black flex items-center justify-center font-black text-3xl mx-auto mb-4 shadow-xl group-hover:scale-110 transition-transform">{item.l}</div>
+                       <p className="font-black text-sm uppercase tracking-tighter mb-2">{item.t}</p>
+                       <p className="text-[10px] text-blue-100 opacity-80 leading-snug">{item.d}</p>
+                    </div>
+                  ))}
+               </div>
+            </div>
+
+            {/* 3. THE EXACT SCRIPT WITH COPY FEATURE */}
+            <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-[#252A2E] relative overflow-hidden border border-gray-100">
+               <div className="absolute top-0 right-0 p-6">
+                  <button 
+                    onClick={copyToClipboard}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-all ${copied ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500 hover:bg-[#003DA5] hover:text-white shadow-sm'}`}
+                  >
+                    {copied ? <Check size={14}/> : <Copy size={14}/>}
+                    {copied ? 'Copied!' : 'Copy Script'}
+                  </button>
+               </div>
+               
+               <h4 className="font-black text-xl mb-8 uppercase tracking-tight text-[#003DA5] border-b pb-4 pr-32">The SDR Opening Script</h4>
+               <div ref={scriptRef} className="text-[13px] text-gray-700 leading-relaxed italic border-l-8 border-[#FBAD26] pl-8 space-y-6 font-bold">
+                 <p>
+                   "Hi [Prospect Name], thanks again for taking the time today. I know you have a busy schedule, so we really appreciate you joining. Before we dive in, I want to quickly recap why we connected and make sure today is valuable for you.
+                 </p>
+                 <p>
+                   From our earlier conversation, you mentioned [insert key pain point, initiative, or trigger]. We also talked about [any relevant context about timeline, current tools, or business priority], and you were interested in exploring new solutions to help with [problem].
+                 </p>
+                 <p>
+                   The goal for today is to go a level deeper into your current process, understand what success looks like for you, look at how Trimble could potentially get you to [solution], and explore whether it makes sense to continue the conversation.
+                 </p>
+                 <p>
+                   Now that I’ve set the stage, I’d love to introduce you to [AE Name]. [AE Name] works closely with companies like yours – specifically [relevant industry/segment] – and spends a lot of time helping teams navigate [problem area]. I’ve shared some of the context for the call today, but they will be your point of contact moving forward, and walk through the agenda for the call. We should be able to do all of this within the allotted [meeting length] time, are there any hard stops we should know about?
+                 </p>
+                 <p className="font-black not-italic text-[#003DA5] uppercase border-t pt-4 mt-6">
+                   [AE Name], I’ll let you take it from here!"
+                 </p>
+               </div>
+            </div>
+         </div>
+      </div>
+    </div>
+  );
+};
+
+const CadenceSection = () => (
+  <div className="space-y-16 animate-in fade-in duration-500">
+    <SectionHeading title="SDR & AE Communication Cadence" subtitle="Standardized Alignment" />
+    
+    <div className="bg-white p-10 rounded-3xl border border-gray-100 shadow-xl mb-16">
+       <h3 className="text-2xl font-black mb-6">Why A Standardized Cadence Matters</h3>
+       <p className="text-gray-600 leading-relaxed mb-6">
+         Strong SDR and AE partnerships don’t happen by chance. They are built through consistent, structured communication. A defined communication cadence creates alignment on priorities and expectation, visibility into pipeline quality and performance, and continuous feedback loops that improve outcomes over time.
+       </p>
+       <div className="grid md:grid-cols-2 gap-8 mb-10">
+          <div className="p-6 bg-red-50 rounded-2xl border border-red-100">
+             <p className="text-xs font-black text-red-600 uppercase mb-3">Without it:</p>
+             <p className="text-xs text-gray-600 leading-relaxed">SDRs generate activity without clear direction, AEs react to pipeline instead of shaping it, and feedback is typically inconsistent, delayed, or lost completely.</p>
+          </div>
+          <div className="p-6 bg-green-50 rounded-2xl border border-green-100">
+             <p className="text-xs font-black text-green-600 uppercase mb-3">With it:</p>
+             <p className="text-xs text-gray-600 leading-relaxed">Pipeline is built strategically instead of reactively, messaging evolves based on real outcomes, and both roles stay aligned from first touch throughout the deal.</p>
+          </div>
+       </div>
+
+       {/* NEW SUBSECTION: Importance of the Feedback Loop */}
+       <div className="mt-12 pt-12 border-t border-gray-100">
+          <h4 className="text-xl font-bold mb-6 flex items-center gap-3 text-gray-900">
+             <RefreshCw className="text-[#003DA5]" /> The Importance of the Feedback Loop
+          </h4>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+             <div className="space-y-6 text-gray-700 leading-relaxed font-medium">
+                <p>
+                  A communication cadence only matters if the insights gained in our meetings lead to action. What we learn should show up in how we adjust behavior, refine messaging, strengthen qualification, and improve overall strategy.
+                </p>
+                <div className="bg-blue-50 p-6 rounded-2xl border-l-4 border-[#FBAD26]">
+                   <p className="italic text-sm text-[#003DA5]">
+                    Ultimately, we’re seeking to improve pipeline quality and conversion over time, and that depends on how effectively our feedback is captured, shared, applied, and iterated on.
+                   </p>
+                </div>
+             </div>
+             <div>
+                <FeedbackLoopSVG />
+             </div>
+          </div>
+       </div>
+    </div>
+
+    {/* OUTBOUND DETAILED SECTION */}
+    <div className="mb-32">
+       <h3 className="text-2xl font-black mb-8 border-b-4 border-[#003DA5] pb-4 inline-block">Outbound & Customer Detailed Cadence</h3>
+       <div className="bg-white p-10 rounded-3xl border border-gray-100 shadow-xl mb-12">
+          <h4 className="font-black text-lg mb-6">What Partnership Looks Like: Responsibilities</h4>
+          <div className="overflow-x-auto">
+             <table className="w-full text-xs text-left border-collapse">
+                <thead className="bg-[#252A2E] text-white">
+                   <tr>
+                      <th className="p-4 border border-gray-700">Role</th>
+                      <th className="p-4 border border-gray-700">Responsibilities</th>
+                      <th className="p-4 border border-gray-700">Goal</th>
+                   </tr>
+                </thead>
+                <tbody className="text-gray-700">
+                   <tr>
+                      <td className="p-4 border font-bold">SDR (Outbound/Customer)</td>
+                      <td className="p-4 border leading-relaxed">
+                         • Proactively generate pipeline within target accounts/industries.<br/>
+                         • Research accounts and identify relevant personas<br/>
+                         • Execute outreach aligned to account/industry strategy<br/>
+                         • Qualify opportunities before handoff
+                      </td>
+                      <td className="p-4 border italic">AEs receive well-qualified meetings aligned to account priorities and deal strategy</td>
+                   </tr>
+                   <tr>
+                      <td className="p-4 border font-bold">Account Executive</td>
+                      <td className="p-4 border leading-relaxed">
+                         • Provide clear account direction and priorities<br/>
+                         • Convert meetings into pipeline and advance opportunities<br/>
+                         • Deliver actionable feedback on meeting quality<br/>
+                         • Share deal insights that inform upstream strategy
+                      </td>
+                      <td className="p-4 border italic">Pipeline progresses effectively and continuously improves upstream performance</td>
+                   </tr>
+                   <tr className="bg-blue-50">
+                      <td className="p-4 border font-black text-[#003DA5]">Shared Ownership</td>
+                      <td className="p-4 border leading-relaxed font-medium">
+                         • Pipeline quality and conversion<br/>
+                         • Account prioritization<br/>
+                         • Messaging alignment<br/>
+                         • Continuous improvement of the motion
+                      </td>
+                      <td className="p-4 border italic font-bold text-[#003DA5]">A coordinated, account-focused motion that drives high-quality pipeline and revenue goals</td>
+                   </tr>
+                </tbody>
+             </table>
+          </div>
+       </div>
+
+       {/* CORE OPERATING RHYTHM: 1:1 */}
+       <div className="bg-blue-900 text-white p-10 rounded-[2.5rem] shadow-2xl mb-16 relative overflow-hidden">
+          <h4 className="text-2xl font-black mb-8 flex items-center gap-3">
+             <Clock size={32} className="text-[#FBAD26]" />
+             1. Weekly SDR & AE 1:1 (Core Operating Rhythm)
+          </h4>
+          <div className="bg-white rounded-3xl overflow-hidden text-[#252A2E] shadow-xl">
+             <div className="grid grid-cols-5 bg-slate-100 text-[9px] font-black uppercase tracking-widest p-4 border-b border-gray-200">
+                <div>Section</div>
+                <div>Time</div>
+                <div className="text-blue-700">SDR Contribution</div>
+                <div className="text-slate-700">AE Contribution</div>
+                <div className="text-[#003DA5]">Takeaways</div>
+             </div>
+             <div className="divide-y divide-gray-100">
+                {[
+                   { s: "Pipeline Reality", t: "10 min", sdr: "Listen for ICP fit patterns, Persona quality, Timing + urgency signals", ae: "Share meetings that progressed vs stalled, wins/risks/deal shifts", out: "Refined qualification definition" },
+                   { s: "Working / Not", t: "10 min", sdr: "Messaging responses, early objections, Intent signals", ae: "Share late objections killing deals, Discovery gaps, Missing context", out: "1 thing to double down on / Messaging refinements" },
+                   { s: "Priority Plays", t: "5-7 min", sdr: "Outreach approach for top 3-5 priority accounts", ae: "Budget/initiative intel, Buying committee insights, Known blockers", out: "Clear, coordinated hunting plan" },
+                   { s: "Next Steps", t: "3-5 min", sdr: "Checks on Qualification quality, Were notes/context sufficient?", ae: "Validate 'what good looks like', Adjustments needed", out: "Continuous improvement loop / No repeated mistakes" }
+                ].map((row, i) => (
+                   <div key={i} className="grid grid-cols-5 p-5 items-center gap-4 text-[11px]">
+                      <div className="font-black">{row.s}</div>
+                      <div className="text-gray-400 italic">{row.t}</div>
+                      <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">{row.sdr}</div>
+                      <div className="bg-slate-50 p-3 rounded-xl border border-gray-100">{row.ae}</div>
+                      <div className="font-bold text-[#003DA5]">{row.out}</div>
+                   </div>
+                ))}
+             </div>
+          </div>
+       </div>
+
+       {/* OUTBOUND MEETING DEEP DIVES */}
+       <div className="grid lg:grid-cols-3 gap-8">
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-lg flex flex-col">
+             <h5 className="font-black text-sm mb-4 uppercase tracking-widest">2. Bi-Weekly/Monthly Pipeline Review</h5>
+             <div className="text-[11px] text-gray-600 space-y-4 flex-grow">
+                <p><strong>Participants:</strong> Manager + AE + SDR</p>
+                <p><strong>Focus:</strong> Evaluate overall pipeline health and conversion trends (Meeting → Opp → Close).</p>
+                <div className="bg-slate-50 p-4 rounded-xl">
+                   <p className="font-bold text-black mb-2 italic">Are we creating pipeline that actually converts? Where are deals getting stuck?</p>
+                </div>
+             </div>
+          </div>
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-lg flex flex-col">
+             <h5 className="font-black text-sm mb-4 uppercase tracking-widest">3. Monthly Strategy Sync</h5>
+             <div className="text-[11px] text-gray-600 space-y-4 flex-grow">
+                <p><strong>Participants:</strong> Segment + Industry Level AEs, SDRs, Managers</p>
+                <p><strong>Topics:</strong> Account penetration strategy, Campaign focus, Competitor positioning.</p>
+                <div className="bg-slate-50 p-4 rounded-xl">
+                   <p className="font-bold text-black mb-2">SDR Preparation:</p>
+                   <p>Frontline insights (what buyers are saying), messaging effectiveness data.</p>
+                </div>
+             </div>
+          </div>
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-lg flex flex-col">
+             <h5 className="font-black text-sm mb-4 uppercase tracking-widest">4. Quarterly Planning</h5>
+             <div className="text-[11px] text-gray-600 space-y-4 flex-grow">
+                <p><strong>Purpose:</strong> Align activity to territory strategy. Translate conversion insights into business-level strategy shifts.</p>
+                <div className="bg-slate-50 p-4 rounded-xl">
+                   <p className="font-bold text-black mb-2">Key Question:</p>
+                   <p>Are we generating enough pipeline in the right accounts?</p>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+
+    {/* INBOUND DETAILED SECTION */}
+    <div className="mb-16">
+       <h3 className="text-2xl font-black mb-8 border-b-4 border-[#FBAD26] pb-4 inline-block">Inbound Detailed Cadence</h3>
+       <div className="bg-white p-10 rounded-3xl border border-gray-100 shadow-xl mb-12">
+          <h4 className="font-black text-lg mb-6 text-[#003DA5]">Inbound SDR & AE Partnership Goals</h4>
+          <p className="text-sm text-gray-600 mb-8">Because Inbound SDRs are not aligned to specific AEs, partnership is not built through individual relationships, but through a shared system of feedback loops.</p>
+          <div className="overflow-x-auto">
+             <table className="w-full text-xs text-left border-collapse">
+                <thead className="bg-[#252A2E] text-white">
+                   <tr>
+                      <th className="p-4 border border-gray-700">Role</th>
+                      <th className="p-4 border border-gray-700">Responsibilities</th>
+                      <th className="p-4 border border-gray-700">Goal</th>
+                   </tr>
+                </thead>
+                <tbody className="text-gray-700">
+                   <tr>
+                      <td className="p-4 border font-bold">Inbound SDR</td>
+                      <td className="p-4 border leading-relaxed">
+                         • Respond quickly to inbound leads<br/>
+                         • Qualify against defined criteria<br/>
+                         • Capture actionable context<br/>
+                         • Accurately route opportunities
+                      </td>
+                      <td className="p-4 border italic">AEs receive well-qualified, well-documented, and properly routed opportunities</td>
+                   </tr>
+                   <tr>
+                      <td className="p-4 border font-bold">Account Executive (AE)</td>
+                      <td className="p-4 border leading-relaxed">
+                         • Act quickly on routed leads<br/>
+                         • Accept or reject leads with clear reasoning<br/>
+                         • Provide feedback on lead quality and context<br/>
+                         • Identify patterns impacting deal success
+                      </td>
+                      <td className="p-4 border italic">Inbound leads are converted into real pipeline and continuously improved</td>
+                   </tr>
+                </tbody>
+             </table>
+          </div>
+       </div>
+
+       {/* INBOUND CADENCE STEPS */}
+       <div className="space-y-8">
+          <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-100">
+             <h4 className="text-xl font-black mb-6">1. Daily: Lead Routing & SLA Alignment</h4>
+             <div className="grid md:grid-cols-2 gap-12">
+                <div className="space-y-4">
+                   <p className="text-[10px] font-black text-[#003DA5] uppercase tracking-widest border-b pb-2">SDR Support</p>
+                   <ul className="text-xs space-y-2 text-gray-600">
+                      <li>• Respond to inbound leads within SLA</li>
+                      <li>• Qualify and route to the correct AE</li>
+                      <li>• Escalate high-value or unclear opportunities</li>
+                   </ul>
+                </div>
+                <div className="space-y-4">
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b pb-2">AE Support</p>
+                   <ul className="text-xs space-y-2 text-gray-600">
+                      <li>• Follow up on routed leads promptly</li>
+                      <li>• Flag urgent issues or misroutes in real time</li>
+                      <li>• Inform SDR Leadership of territory changes</li>
+                   </ul>
+                </div>
+             </div>
+          </div>
+
+          <div className="bg-slate-900 text-white p-10 rounded-[2.5rem] shadow-2xl">
+             <h4 className="text-xl font-black mb-8 flex items-center gap-3"><Users size={24} className="text-[#FBAD26]"/> 2. Weekly: Inbound Quality Sync (30–45 min)</h4>
+             <div className="grid lg:grid-cols-2 gap-12">
+                <div className="space-y-6">
+                   <div>
+                      <p className="text-xs font-black text-[#FBAD26] uppercase mb-4 tracking-widest">Shared Performance Review</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                            <p className="font-bold text-xs mb-1">Lead Quality Review</p>
+                            <p className="text-[10px] opacity-70 leading-tight">% of leads accepted vs rejected; trends by demo source vs events.</p>
+                         </div>
+                         <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                            <p className="font-bold text-xs mb-1">Routing Accuracy</p>
+                            <p className="text-[10px] opacity-70 leading-tight">Misrouted leads by segment; Edge cases causing confusion.</p>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+                <div className="bg-white/10 p-8 rounded-3xl backdrop-blur-md border border-white/10">
+                   <p className="text-xs font-black text-[#FBAD26] uppercase mb-4 tracking-widest">Voice of the Field (Aggregated)</p>
+                   <div className="space-y-6 text-white">
+                      <div>
+                         <p className="font-bold text-sm mb-1">AE Feedback Patterns</p>
+                         <p className="text-[11px] opacity-70 italic leading-relaxed">"What makes a good inbound lead? What is missing from context? Patterns in poor-fit leads."</p>
+                      </div>
+                      <div>
+                         <p className="font-bold text-sm mb-1">SDR Feedback Patterns</p>
+                         <p className="text-[11px] opacity-70 italic leading-relaxed">"Common objections or confusion points. Patterns across specific lead sources."</p>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+             <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-lg">
+                <h5 className="font-black text-sm mb-4 uppercase text-[#003DA5]">3. Bi-Weekly Intake Alignment</h5>
+                <div className="text-[11px] text-gray-600 space-y-3 font-medium">
+                   <p><strong>Participants:</strong> SDR, Marketing, Operations</p>
+                   <p><strong>Focus:</strong> Campaign targeting, form field refinement to get intent upfront.</p>
+                   <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 font-black text-[#003DA5] text-center uppercase tracking-tighter">Reduced re-qualification effort</div>
+                </div>
+             </div>
+             <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-lg">
+                <h5 className="font-black text-sm mb-4 uppercase text-[#003DA5]">4. Monthly Funnel Health Sync</h5>
+                <div className="text-[11px] text-gray-600 space-y-3 font-medium">
+                   <p><strong>Focus:</strong> Lead → Meeting → Opp → Revenue analysis across industry and segment.</p>
+                   <p><strong>Takeaway:</strong> Adjusted qualification thresholds and refined scoring logic.</p>
+                   <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 font-black text-[#003DA5] text-center uppercase tracking-tighter">improved pipeline efficiency</div>
+                </div>
+             </div>
+             <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-lg">
+                <h5 className="font-black text-sm mb-4 uppercase text-[#003DA5]">5. Quarterly Strategic Alignment</h5>
+                <div className="text-[11px] text-gray-600 space-y-3 font-medium">
+                   <p><strong>Purpose:</strong> Align inbound capacity with company growth targets. Prioritize demand sources.</p>
+                   <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 font-black text-[#003DA5] text-center uppercase tracking-tighter">Alignment to Revenue strategy</div>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+  </div>
+);
+
+const AccountStrategySection = () => (
+  <div className="space-y-16 animate-in fade-in duration-500">
+    <SectionHeading title="Target Account Strategy Framework" subtitle="Prioritized Engagement" />
+    
+    <div className="bg-white p-10 rounded-3xl border border-gray-100 shadow-xl mb-16 relative overflow-hidden">
+       <div className="absolute top-0 right-0 p-10 opacity-5"><Map size={200} /></div>
+       <div className="relative z-10">
+          <h3 className="text-2xl font-black mb-6">Developing a Shared Approach</h3>
+          <p className="text-gray-600 leading-relaxed mb-8 max-w-4xl font-medium">
+             Collaborating on account strategy is not a one-time planning exercise. It is an ongoing session refined through weekly 1:1s. At its core, this framework enables SDRs and AEs to prioritize accounts by strategic value, coordinate engagement, and execute a multi-threaded approach.
+          </p>
+          <div className="bg-blue-50 p-6 rounded-2xl border-l-8 border-[#003DA5]">
+             <div className="flex items-center gap-4">
+                <div className="p-2 bg-white rounded-lg shadow-sm">
+                   <Info className="text-[#003DA5]" size={24} />
+                </div>
+                <p className="text-sm font-medium text-gray-800 italic">
+                   "Tier 1, 2, and 3 accounts are relative to the segment. Not all accounts within a segment deserve the same attention; tiering helps us focus on where the Qualified Pipeline is most likely to move."
+                </p>
+             </div>
+          </div>
+       </div>
+    </div>
+
+    {/* COLLABORATION EXPECTATIONS TABLE */}
+    <div className="mb-20">
+       <SubHeading title="Collaboration Expectations for Tiering" icon={Handshake} />
+       <div className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-xl">
+          <div className="grid grid-cols-2 divide-x divide-gray-100 bg-[#252A2E] text-white p-6">
+             <div className="px-4">
+                <p className="text-[#FBAD26] font-black uppercase text-xs tracking-widest mb-4">Account Executive</p>
+                <ul className="space-y-3 text-xs opacity-90 font-medium">
+                   <li>• Defines territory strategy and revenue goals</li>
+                   <li>• Provides knowledge of existing relationships/history</li>
+                   <li>• Identifies whitespace and expansion potential</li>
+                   <li>• Shares win/loss insights and messaging feedback</li>
+                </ul>
+             </div>
+             <div className="px-4">
+                <p className="text-[#FBAD26] font-black uppercase text-xs tracking-widest mb-4">Sales Development Rep</p>
+                <ul className="space-y-3 text-xs opacity-90 font-medium">
+                   <li>• Brings market insights and prospecting signals (intent)</li>
+                   <li>• Provides contact-level visibility & stakeholder access</li>
+                   <li>• Shares feedback on messaging resonance</li>
+                   <li>• Aligns messaging to AE strategy and personas</li>
+                </ul>
+             </div>
+          </div>
+          <div className="bg-slate-50 p-6 border-t border-gray-100">
+             <p className="text-[10px] font-black uppercase text-[#003DA5] tracking-widest mb-3 text-center">Shared Responsibility</p>
+             <p className="text-sm text-gray-700 text-center font-bold px-10">
+                Align on Tier prioritization, adjust based on pipeline movement, and ensure SDR effort is focused on the highest-impact opportunities within the segment.
+             </p>
+          </div>
+       </div>
+    </div>
+
+    {/* THE TIERS DEEP DIVE */}
+    <div className="space-y-24 mb-24">
+      
+       {/* TIER 1 */}
+       <div className="bg-white rounded-[3rem] p-10 md:p-16 border-t-8 border-[#003DA5] shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-12 opacity-5"><Trophy size={200}/></div>
+          <div className="grid lg:grid-cols-3 gap-16 relative z-10">
+             <div className="lg:col-span-1">
+                <div className="bg-[#003DA5] w-16 h-16 rounded-full flex items-center justify-center text-white font-black text-3xl mb-8 shadow-lg shadow-blue-200 italic">A</div>
+                <h3 className="text-4xl font-black text-gray-900 mb-6">Tier 1: Strategic</h3>
+                <p className="text-gray-600 leading-relaxed mb-8">The highest-priority accounts within a segment. They justify the highest level of coordinated effort and tailored engagement.</p>
+                <div className="space-y-4">
+                   <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                      <p className="font-bold text-xs text-[#003DA5] uppercase mb-2">Segment Context</p>
+                      <ul className="text-xs space-y-3 text-gray-700 font-medium">
+                         <li><strong className="text-black">Strategic:</strong> $40M+ GAR, multi-entity, infra/digital transform focus.</li>
+                         <li><strong className="text-black">Mid-Market:</strong> High-growth regional players with strong buying signals.</li>
+                         <li><strong className="text-black">SMB:</strong> Faster buying cycles, Repeatable use cases.</li>
+                      </ul>
+                   </div>
+                </div>
+             </div>
+             <div className="lg:col-span-2 bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100">
+                <p className="text-[#003DA5] font-black uppercase text-xs tracking-widest mb-8 border-b border-blue-100 pb-4">Approach for Strategic Accounts</p>
+                <div className="grid md:grid-cols-2 gap-10">
+                   <div className="space-y-6">
+                      <div>
+                         <h5 className="font-black text-sm mb-2 flex items-center gap-2 text-gray-900 underline decoration-[#FBAD26]"><ChevronRight size={16}/> Account Planning</h5>
+                         <p className="text-xs text-gray-500">Joint plan required with clear objectives (entry points, expansion areas) and stakeholder mapping.</p>
+                      </div>
+                      <div>
+                         <h5 className="font-black text-sm mb-2 flex items-center gap-2 text-gray-900 underline decoration-[#FBAD26]"><ChevronRight size={16}/> Deep Research</h5>
+                         <p className="text-xs text-gray-500">Leverage ZoomInfo, Earnings, and LinkedIn to build a strong Account POV. Value-based hypothesis mandatory.</p>
+                      </div>
+                      <div>
+                         <h5 className="font-black text-sm mb-2 flex items-center gap-2 text-gray-900 underline decoration-[#FBAD26]"><ChevronRight size={16}/> Multi-threading</h5>
+                         <p className="text-xs text-gray-500">Engage Economic Buyers, Technical Users, and Influencers. Map known contacts vs gaps.</p>
+                      </div>
+                   </div>
+                   <div className="space-y-6">
+                      <div>
+                         <h5 className="font-black text-sm mb-2 flex items-center gap-2 text-gray-900 underline decoration-[#FBAD26]"><ChevronRight size={16}/> Sequence Customization</h5>
+                         <p className="text-xs text-gray-500">Personalize based on business priorities. Coordinate across SDR, AE, and Product sellers.</p>
+                      </div>
+                      <div>
+                         <h5 className="font-black text-sm mb-2 flex items-center gap-2 text-gray-900 underline decoration-[#FBAD26]"><ChevronRight size={16}/> Weekly Inspection</h5>
+                         <p className="text-xs text-gray-500">Review in Weekly 1:1s. Adjust tiering, messaging, and focus based on real-time feedback loops.</p>
+                      </div>
+                      <div>
+                         <h5 className="font-black text-sm mb-2 flex items-center gap-2 text-gray-900 underline decoration-[#FBAD26]"><ChevronRight size={16}/> Step Ownership</h5>
+                         <p className="text-xs text-gray-500">Maintain momentum by defining next steps after every interaction. Clear advancement criteria.</p>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+
+       {/* TIER 2 */}
+       <div className="bg-white rounded-[3rem] p-10 md:p-16 border-t-8 border-[#FBAD26] shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-12 opacity-5"><TrendingUp size={200}/></div>
+          <div className="grid lg:grid-cols-3 gap-16 relative z-10">
+             <div className="lg:col-span-1">
+                <div className="bg-[#FBAD26] w-16 h-16 rounded-full flex items-center justify-center text-black font-black text-3xl mb-8 shadow-lg shadow-yellow-100 italic">B</div>
+                <h3 className="text-4xl font-black text-gray-900 mb-6">Tier 2: Growth</h3>
+                <p className="text-gray-600 leading-relaxed mb-8">Strong ICP alignment but not yet enough depth or urgency to justify Tier 1 complexity. The "Build & Validate" stage.</p>
+                <div className="bg-yellow-50 p-6 rounded-2xl border border-yellow-100">
+                   <p className="font-black text-[10px] uppercase text-gray-500 mb-4 tracking-tighter">Attributes</p>
+                   <ul className="text-xs space-y-2 text-gray-700">
+                      <li>• Moderate intent signals (content/hiring)</li>
+                      <li>• Expansion potential customers</li>
+                      <li>• Partial buying group access</li>
+                      <li>• Accounts historically engaged</li>
+                   </ul>
+                </div>
+             </div>
+             <div className="lg:col-span-2 space-y-10">
+                <p className="text-[#003DA5] font-black uppercase text-xs tracking-widest mb-2 border-b border-gray-100 pb-4">Approach for Growth Accounts</p>
+                <div className="grid md:grid-cols-2 gap-8">
+                   <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                      <div className="flex items-center gap-3 mb-4">
+                         <Workflow className="text-[#003DA5]" size={20} />
+                         <h5 className="font-bold text-sm">Targeted Campaigns</h5>
+                      </div>
+                      <p className="text-xs text-gray-500">Align outreach to key personas/initiatives (Estimating, visibility, etc.). Focus on known business triggers like bids.</p>
+                   </div>
+                   <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                      <div className="flex items-center gap-3 mb-4">
+                         <Maximize2 className="text-[#003DA5]" size={20} />
+                         <h5 className="font-bold text-sm">Focused Multi-threading</h5>
+                      </div>
+                      <p className="text-xs text-gray-500">Start with 1-2 key personas. Expand as engagement grows. Avoid over-investing in mapping too early.</p>
+                   </div>
+                   <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                      <div className="flex items-center gap-3 mb-4">
+                         <RefreshCw className="text-[#003DA5]" size={20} />
+                         <h5 className="font-bold text-sm">Agile Sequencing</h5>
+                      </div>
+                      <p className="text-xs text-gray-500">Use adaptable sequences across calls, email, and LinkedIn. Moderate customization focused on relevance.</p>
+                   </div>
+                   <div className="bg-[#252A2E] p-6 rounded-2xl shadow-lg text-white">
+                      <div className="flex items-center gap-3 mb-4">
+                         <MoveUp className="text-[#FBAD26]" size={20} />
+                         <h5 className="font-bold text-sm">Elevation Monitoring</h5>
+                      </div>
+                      <p className="text-xs text-gray-400 italic">Promote to Tier 1 when responsiveness increases, decision-makers engage, or initiatives are confirmed.</p>
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+
+       {/* TIER 3 */}
+       <div className="bg-slate-50 rounded-[3rem] p-10 md:p-16 border-t-8 border-slate-300 shadow-xl relative">
+          <div className="grid lg:grid-cols-3 gap-16">
+             <div className="lg:col-span-1">
+                <div className="bg-slate-400 w-16 h-16 rounded-full flex items-center justify-center text-white font-black text-3xl mb-8 italic">C</div>
+                <h3 className="text-4xl font-black text-gray-900 mb-6">Tier 3: Volume</h3>
+                <p className="text-gray-600 leading-relaxed mb-8">Lower-priority accounts aligned to ICP but lacking signals. Outreach focuses on scalable efficiency and territory coverage.</p>
+             </div>
+             <div className="lg:col-span-2">
+                <p className="text-gray-400 font-black uppercase text-xs tracking-widest mb-8 border-b border-gray-200 pb-4">Efficiency-Led Execution</p>
+                <div className="grid md:grid-cols-3 gap-6">
+                   <div className="space-y-4">
+                      <h6 className="font-black text-xs uppercase text-[#003DA5]">SDR Owned</h6>
+                      <p className="text-11px text-gray-500 leading-relaxed">Prospected by SDR alone. AE engaged only once interest signals emerge. Accept lower conversion as part of high-volume play.</p>
+                   </div>
+                   <div className="space-y-4">
+                      <h6 className="font-black text-xs uppercase text-[#003DA5]">Standard Messaging</h6>
+                      <p className="text-11px text-gray-500 leading-relaxed">Leverage repeatable messaging and templated sequences. Maintain activity levels to ensure no viable account goes untouched.</p>
+                   </div>
+                   <div className="space-y-4">
+                      <h6 className="font-black text-xs uppercase text-[#003DA5]">Trigger-Based</h6>
+                      <p className="text-11px text-gray-500 leading-relaxed">Light qualification. Recycle cold accounts quarterly. Elevate to Tier 2 immediately upon reply or engagement.</p>
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+
+    {/* PLANNING EXPECTATIONS */}
+    <div className="bg-white p-12 rounded-[2.5rem] shadow-xl border border-gray-100 mb-20">
+       <SectionHeading title="Planning Expectations" subtitle="Strategic Preparation" />
+       <div className="grid lg:grid-cols-2 gap-12">
+          <div className="space-y-10">
+             <div className="flex gap-6">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#003DA5] flex items-center justify-center font-black shrink-0">1</div>
+                <div>
+                   <h4 className="font-bold text-lg mb-2">Stakeholder Mapping</h4>
+                   <p className="text-xs text-gray-500">Required for Tier 1. Identify champions, economic buyers, blockers, and influencers. Map known contacts vs coverage gaps.</p>
+                </div>
+             </div>
+             <div className="flex gap-6">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#003DA5] flex items-center justify-center font-black shrink-0">2</div>
+                <div>
+                   <h4 className="font-bold text-lg mb-2">Multi-Threading Strategy</h4>
+                   <p className="text-xs text-gray-500">Avoid single-threaded risk. Coordinate outreach timing to build momentum across functions. Ensure consistent, non-overlapping messaging.</p>
+                </div>
+             </div>
+          </div>
+          <div className="space-y-10">
+             <div className="flex gap-6">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#003DA5] flex items-center justify-center font-black shrink-0">3</div>
+                <div>
+                   <h4 className="font-bold text-lg mb-2">Value Hypothesis per Account</h4>
+                   <p className="text-xs text-gray-500 mb-3 italic">"Generic messaging should be avoided!"</p>
+                   <ul className="text-xs text-gray-500 space-y-1">
+                      <li>• What challenges are likely present?</li>
+                      <li>• What initiatives may be underway?</li>
+                      <li>• Where does Trimble create value?</li>
+                   </ul>
+                </div>
+             </div>
+             <div className="flex gap-6">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#003DA5] flex items-center justify-center font-black shrink-0">4</div>
+                <div>
+                   <h4 className="font-bold text-lg mb-2">Sequence Alignment</h4>
+                   <p className="text-xs text-gray-500">Align themes across channels (calls, email, LinkedIn). SDR sequences must reinforce AE strategy and current account context.</p>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+
+    <div className="bg-[#003DA5] p-10 rounded-3xl text-white">
+       <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+          <div>
+             <h4 className="text-xl font-black mb-2 flex items-center gap-3"><Clock size={24} className="text-[#FBAD26]"/> Recommended Operating Rhythm</h4>
+             <p className="text-sm text-blue-100 opacity-80">Consistency drives pipeline quality and conversion over time.</p>
+          </div>
+          <div className="flex flex-wrap gap-4">
+             <div className="bg-white/10 px-6 py-3 rounded-2xl border border-white/10 text-center">
+                <p className="text-[13px] font-black uppercase text-[#FBAD26]">Tier 1 (A)</p>
+                <p className="text-xs font-bold uppercase">Weekly 1:1 Review</p>
+             </div>
+             <div className="bg-white/10 px-6 py-3 rounded-2xl border border-white/10 text-center">
+                <p className="text-[13px] font-black uppercase text-gray-400">Tier 2 (B)</p>
+                <p className="text-xs font-bold uppercase">Bi-Weekly Review</p>
+             </div>
+             <div className="bg-white/10 px-6 py-3 rounded-2xl border border-white/10 text-center">
+                <p className="text-[13px] font-black uppercase text-gray-400">Tier 3 (C)</p>
+                <p className="text-xs font-bold uppercase">Managed by Metrics</p>
+             </div>
+          </div>
+       </div>
+    </div>
+  </div>
+);
+
+const MetricsSection = () => (
+  <div className="space-y-16 animate-in fade-in duration-500">
+    <SectionHeading title="Pipeline Visibility & Performance Metrics" subtitle="Data Over Anecdotes" />
+    
+    <div className="bg-white p-12 rounded-[3rem] border border-gray-100 shadow-xl mb-16 relative overflow-hidden">
+       <div className="absolute top-0 right-0 p-10 opacity-5"><Gauge size={250} /></div>
+       <div className="relative z-10 max-w-5xl">
+          <h3 className="text-3xl font-black mb-8 text-gray-900">A Shared Language for Success</h3>
+          <p className="text-gray-600 leading-relaxed mb-10 text-lg font-medium">
+            Metrics are indicators of how effectively SDRs and AEs are working together. To build pipeline that progresses predictably, both roles must understand how success is measured and how their actions directly impact one another’s outcomes.
+          </p>
+          <div className="grid md:grid-cols-2 gap-8">
+             <div className="bg-[#0063A3] text-white p-8 rounded-[2rem] shadow-xl border-t-4 border-[#FBAD26]">
+                <div className="flex items-center gap-3 mb-4 border-b border-white/20 pb-4">
+                  <UserCheck className="text-[#FBAD26]" size={24} />
+                  <p className="text-sm font-black uppercase tracking-widest">SDR Accountability</p>
+                </div>
+                <p className="text-sm leading-relaxed opacity-90 font-medium">Creating opportunities that meet qualification standards, driving access to stakeholders, and establishing business problems.</p>
+             </div>
+             <div className="bg-[#252A2E] text-white p-8 rounded-[2rem] shadow-xl border-t-4 border-[#FBAD26]">
+                <div className="flex items-center gap-3 mb-4 border-b border-white/20 pb-4">
+                  <Briefcase className="text-[#FBAD26]" size={24} />
+                  <p className="text-sm font-black uppercase tracking-widest">AE Accountability</p>
+                </div>
+                <p className="text-sm leading-relaxed opacity-90 font-medium">Timely engagement, validating/deepening qualification, advancing Opps, and providing actionable feedback back to SDRs.</p>
+             </div>
+          </div>
+       </div>
+    </div>
+
+    {/* DIAGNOSTIC GUIDE FOR SDR MANAGERS */}
+    <div className="mb-24">
+       <SubHeading title="Diagnostic Guide for SDR Managers" icon={GraduationCap} />
+       <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-gray-200">
+          <div className="overflow-x-auto">
+             <table className="w-full text-sm text-left">
+                <thead className="bg-[#252A2E] text-white font-black uppercase tracking-widest text-[11px]">
+                   <tr>
+                      <th className="p-8 border-r border-white/10 w-1/4">Signal / Metric</th>
+                      <th className="p-8 border-r border-white/10 w-1/3 text-[#FBAD26]">Possible Reasons - Context & Examples</th>
+                      <th className="p-8 w-1/3 text-[#FBAD26]">Manager Coaching Actions</th>
+                   </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-gray-700">
+                   {[
+                     { s: "Low Activity / Low Accounts Worked", r: "Inconsistent daily execution or lack of structure (time management issues). SDR may not have a clear territory plan or may be spending too much time researching vs engaging. Could also be call reluctance or personal motivation.", a: "Establish clear activity expectations. Review territory plans. Implement structured call blocks and outreach cadences. Reinforce tool usage (ZoomInfo, Sales Nav)." },
+                     { s: "Good Activity, Low Conversion to SAO", r: "Outreach is not resonating. Likely issues with messaging relevance (lack of personalization), weak hooks, or targeting wrong personas/accounts.", a: "Review messaging vs top performers (live call/email reviews). Refine ICP and persona targeting. Coach on stronger, problem-led hooks. Test and iterate messaging based on response data." },
+                     { s: "Good Activity + Meetings, Low SQO Conversion", r: "SDRs booking meetings lacking qualification depth or decision makers. Exploratory meetings rather than real need. Poor handoff context or delayed AE follow-up.", a: "Re-anchor on qualification standards and handoff expectations. Audit recent SAOs together (SDR + AE). Align with AEs on what qualifies as 'Discovery-ready.' Enforce AE follow-up SLAs (24 hours)." },
+                     { s: "High Activity, Low Pipeline Creation (ACV)", r: "Meetings are booking but don't translate to meaningful pipeline. Indicates low-value opportunities, weak use cases, or poor targeting.", a: "Shift focus from volume to pipeline value. Revisit ICP and account prioritization. Coach SDRs to identify higher-impact business problems. Increase AE collaboration on targets." },
+                     { s: "Low Average Pipeline Value per Opp", r: "Surface-level discovery. SDRs may not be uncovering full business impact or engaging multiple stakeholders.", a: "Coach expansion-oriented discovery (broader use cases, adjacent teams). Encourage multi-threading. Reinforce identifying business impact and urgency." },
+                     { s: "High Disqualification Rate (Post-SQO)", r: "Opportunities entering pipeline but being disqualified early. Signals weak Need validation, wrong personas, or misaligned expectations set early.", a: "Conduct disqualification analysis (patterns by persona/industry). Strengthen Authority + Need validation. Align SDR messaging with AE discovery." },
+                     { s: "High Closed Lost Rate (SDR-Sourced)", r: "Opportunities progressing but failing to convert. Signals gaps in qualification, weak urgency, or misalignment between initial chat and buyer need.", a: "Run win/loss reviews focused on SDR deals. Identify patterns. Tighten qualification standards. Strengthen SDR & AE feedback loop on outcomes." },
+                     { s: "Strong Pipeline, Low Win Rate", r: "Healthy looking pipeline but weak conversion. Could indicate inflated opportunities or breakdown in AE execution (closing, positioning).", a: "Validate opportunity quality early. Ensure clear advancement criteria. Partner with AE leadership on deal inspection. Reinforce SDR focus on validated problems." },
+                     { s: "Delayed Stage Progression", r: "Opportunities stall between stages. Often caused by delayed AE follow-up, unclear next steps, or lack of urgency from customer.", a: "Reinforce AE follow-up SLAs. Ensure meetings end with clear next steps and stakeholders. Review stalled deals in pipeline reviews. Coach on urgency." },
+                     { s: "High Meeting Volume, Low Acceptance / Trust", r: "AEs pushing back on SDR meetings. Inconsistent qualification or breakdown in partnership trust.", a: "Facilitate alignment sessions. Review examples of strong vs weak meetings. Define shared standard for 'qualified.' Reinforce feedback loops." }
+                   ].map((diag, i) => (
+                     <tr key={i} className="hover:bg-slate-50 transition-colors">
+                        <td className="p-8 font-black text-gray-900 border-r border-gray-100">{diag.s}</td>
+                        <td className="p-8 text-gray-600 leading-relaxed border-r border-gray-100 font-medium">{diag.r}</td>
+                        <td className="p-8 text-[#0063A3] font-medium italic bg-blue-50/30 leading-relaxed">{diag.a}</td>
+                     </tr>
+                   ))}
+                </tbody>
+             </table>
+          </div>
+       </div>
+    </div>
+
+    {/* SDR PERFORMANCE TABLE */}
+    <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-gray-100 mb-20">
+       <div className="bg-[#0063A3] p-8 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <h4 className="font-black text-2xl uppercase tracking-tighter flex items-center gap-4"><UserCheck size={32} /> SDR Performance Metrics</h4>
+          <div className="bg-[#FBAD26] text-black text-xs font-black px-5 py-2 rounded-full uppercase italic shadow-md">Visibility Dashboard</div>
+       </div>
+       <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+             <thead className="bg-slate-50 border-b border-gray-200 text-gray-500 font-black uppercase tracking-widest text-[10px]">
+                <tr>
+                   <th className="p-6">Metric Category</th>
+                   <th className="p-6">Metric</th>
+                   <th className="p-6">What It Measures</th>
+                   <th className="p-6">Why It Matters for Partnership</th>
+                </tr>
+             </thead>
+             <tbody className="divide-y divide-gray-100 text-gray-700 font-medium">
+                <tr className="hover:bg-slate-50">
+                   <td className="p-6 font-bold text-gray-900">Pipeline Creation</td>
+                   <td className="p-6 font-bold">SAO (Sales Accepted)</td>
+                   <td className="p-6 text-gray-600">Opps created by SDRs</td>
+                   <td className="p-6 text-gray-500 italic">Visibility into pipeline generation</td>
+                </tr>
+                <tr className="bg-blue-50">
+                   <td className="p-6 font-black text-[#0063A3]">Pipeline Qualification</td>
+                   <td className="p-6 font-black text-[#0063A3]">SQO (Sales Qualified)</td>
+                   <td className="p-6 text-[#0063A3]">Opps advanced by AE to Discovery</td>
+                   <td className="p-6 text-[#0063A3] italic font-bold">Primary success metric (compensated outcome)</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                   <td className="p-6 font-bold text-gray-900">Conversion</td>
+                   <td className="p-6 font-bold text-red-600">SAO → SQO Rate</td>
+                   <td className="p-6 text-gray-600">% of Opps that meet AE standards</td>
+                   <td className="p-6 text-gray-500 italic">Indicates alignment on qualification quality</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                   <td className="p-6 font-bold text-gray-900">Pipeline Value</td>
+                   <td className="p-6 font-bold">Created Pipeline (ACV)</td>
+                   <td className="p-6 text-gray-600">Total value of SDR-created Opps</td>
+                   <td className="p-6 text-gray-500 italic">Measures pipeline impact and scale</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                   <td className="p-6 font-bold text-gray-900">Revenue Impact</td>
+                   <td className="p-6 font-bold">Closed Won ACV</td>
+                   <td className="p-6 text-gray-600">Revenue generated from SDR pipe</td>
+                   <td className="p-6 text-gray-500 italic">Connects SDR work to business outcomes</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                   <td className="p-6 font-bold text-gray-900">Feedback Loop</td>
+                   <td className="p-6 font-bold"># of Closed Lost Opps</td>
+                   <td className="p-6 text-gray-600">Lost deals with reason captured</td>
+                   <td className="p-6 text-gray-500 italic">Identifies gaps in handoff or execution</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                   <td className="p-6 font-bold text-gray-900">Engagement</td>
+                   <td className="p-6 font-bold">Connections / Talk Time</td>
+                   <td className="p-6 text-gray-600">Level of engagement with prospects</td>
+                   <td className="p-6 text-gray-500 italic">Messaging & targeting effectiveness</td>
+                </tr>
+             </tbody>
+          </table>
+       </div>
+    </div>
+
+    {/* SDR COMPENSATION ALIGNMENT */}
+    <div className="bg-blue-900 text-white p-12 rounded-[3rem] shadow-2xl mb-24 relative overflow-hidden">
+       <div className="absolute top-0 right-0 p-10 opacity-10"><DollarSign size={250}/></div>
+       <div className="relative z-10">
+          <h4 className="text-3xl font-black mb-6 text-[#FBAD26]">Compensation Alignment: What SDRs Are Paid On</h4>
+          <p className="text-xl leading-relaxed mb-10 max-w-4xl font-medium">
+            SDR compensation is aligned to one primary outcome: <strong>Sales Qualified Opportunities (SQOs).</strong>
+          </p>
+          <div className="bg-white/10 p-8 rounded-3xl border border-white/10 backdrop-blur-md max-w-4xl">
+             <p className="text-base italic leading-relaxed text-blue-50 font-medium">
+               "An SQO is recognized when an AE accepts the opportunity and advances the stage in Salesforce to Discovery. This move confirms the opportunity meets our definition of 'qualified' and has progressed into an active sales cycle."
+             </p>
+          </div>
+          <div className="mt-10 flex flex-wrap gap-8 items-center text-sm font-bold uppercase tracking-widest text-[#FBAD26]">
+             <div className="flex items-center gap-3 bg-black/20 py-3 px-6 rounded-full"><CheckCircle2 size={20}/> Standardized Quality</div>
+             <div className="flex items-center gap-3 bg-black/20 py-3 px-6 rounded-full"><CheckCircle2 size={20}/> Active Progression</div>
+          </div>
+       </div>
+    </div>
+
+    {/* AE PERFORMANCE TABLE */}
+    <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-gray-100 mb-20">
+       <div className="bg-[#252A2E] p-8 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <h4 className="font-black text-2xl uppercase tracking-tighter flex items-center gap-4"><Briefcase size={32} className="text-[#FBAD26]" /> AE Performance Metrics</h4>
+          <div className="bg-[#FBAD26] text-black text-xs font-black px-5 py-2 rounded-full uppercase italic shadow-md">Revenue Analysis</div>
+       </div>
+       <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+             <thead className="bg-slate-50 border-b border-gray-200 text-gray-500 font-black uppercase tracking-widest text-[10px]">
+                <tr>
+                   <th className="p-6">Metric</th>
+                   <th className="p-6">What It Measures</th>
+                   <th className="p-6">Why It Matters for Partnership</th>
+                </tr>
+             </thead>
+             <tbody className="divide-y divide-gray-100 text-gray-700 font-medium">
+                <tr className="bg-blue-50">
+                   <td className="p-6 font-black text-[#0063A3]">Closed Won ACV</td>
+                   <td className="p-6 text-[#0063A3] font-bold">Total revenue closed</td>
+                   <td className="p-6 italic font-bold text-[#0063A3]">Final outcome; depends on SDR-AE quality sync</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                   <td className="p-6 font-bold text-gray-900">Pipeline Coverage</td>
+                   <td className="p-6 text-gray-600">Total pipeline relative to quota (3X)</td>
+                   <td className="p-6 text-gray-500 italic">Reflects ability to build sufficient pipe</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                   <td className="p-6 font-bold text-gray-900">Opportunity Advancement Rate</td>
+                   <td className="p-6 text-gray-600">Speed/consistency of stage progression</td>
+                   <td className="p-6 text-gray-500 italic">Discovery and follow-up effectiveness</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                   <td className="p-6 font-bold text-gray-900">Forecast Accuracy (within 1%)</td>
+                   <td className="p-6 text-gray-600">Forecasted vs Actual outcomes</td>
+                   <td className="p-6 text-gray-500 italic">Depends on qualification quality entering the funnel</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                   <td className="p-6 font-bold text-red-600">Closed Lost / Disqualification Rate</td>
+                   <td className="p-6 text-gray-600">Value/Volume of lost opportunities</td>
+                   <td className="p-6 text-red-500 italic font-bold">Pinpoints breakdowns in handoff or execution</td>
+                </tr>
+             </tbody>
+          </table>
+       </div>
+    </div>
+    
+    {/* AE COMPENSATION ALIGNMENT */}
+    <div className="bg-[#252A2E] text-white p-12 rounded-[3rem] shadow-2xl mb-16 border-b-8 border-[#FBAD26]">
+      <div className="flex flex-col md:flex-row items-center gap-12">
+        <div className="bg-white/5 p-8 rounded-full border border-white/10 shrink-0">
+          <Percent size={56} className="text-[#FBAD26]" />
+        </div>
+        <div>
+          <h4 className="text-3xl font-black mb-6">
+            Compensation Alignment: What AEs Are Paid On
+          </h4>
+          <p className="text-xl leading-relaxed mb-6 font-medium">
+            AEs are compensated based on <strong className="text-[#FBAD26]">Closed Won Revenue</strong>.
+          </p>
+          <p className="text-base text-gray-400 max-w-3xl italic leading-relaxed font-medium">
+            "Achieving this outcome is dependent on two unified levers: the quality of
+            opportunities entering the pipeline (SDR responsibility) and the
+            effectiveness of opportunity execution (AE responsibility)."
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const OnboardingSection = () => (
+  <div className="space-y-16 animate-in fade-in duration-500">
+    <SectionHeading title="SDR & AE Partnership in Onboarding" subtitle="Alignment From Day One" />
+    
+    <div className="bg-white p-10 rounded-3xl border border-gray-100 shadow-xl mb-16 relative overflow-hidden">
+       <div className="absolute top-0 right-0 p-10 opacity-5"><GraduationCap size={200} /></div>
+       <div className="relative z-10">
+          <h3 className="text-2xl font-black mb-6 text-gray-900">Building Trust & Pipeline Early</h3>
+          <p className="text-gray-600 leading-relaxed mb-8 max-w-4xl font-medium">
+             Our onboarding experience is designed to quickly align SDRs and AEs to how each role operates within Trimble’s sales model. This structure recalibrates past assumptions, accelerates ramp time, and establishes the foundation for future Account Executive readiness.
+          </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+             {[
+                { t: "Assumptions Reset", d: "Recalibrate how sales works specifically at Trimble early on.", icon: RotateCw },
+                { t: "Shared Visibility", d: "See both sides of the prospecting and closing motion.", icon: Eye },
+                { t: "Experiential Learning", d: "Go beyond documents; participate in real deal scenarios.", icon: BookCheck },
+                { t: "Early Relationships", d: "Familiarity drives trust and higher quality pipeline.", icon: HeartHandshake }
+             ].map((belief, i) => {
+                const Icon = belief.icon;
+                return (
+                  <div key={i} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex flex-col items-center text-center">
+                     <Icon size={28} className="text-[#003DA5] mb-4" />
+                     <p className="font-black text-xs uppercase mb-2 text-gray-900">{belief.t}</p>
+                     <p className="text-11px text-gray-500 leading-relaxed">{belief.d}</p>
+                  </div>
+                );
+             })}
+          </div>
+       </div>
+    </div>
+
+    {/* THE ROLE-SPECIFIC TRACKS */}
+    <div className="grid lg:grid-cols-2 gap-12 mb-20">
+       <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-100 flex flex-col relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-5"><UserCheck size={100}/></div>
+          <h4 className="font-black text-xl mb-8 flex items-center gap-3">
+             <div className="w-1.5 h-8 bg-[#003DA5] rounded-full"></div>
+             SDR Track: Learning the AE Path
+          </h4>
+          <div className="space-y-6 flex-grow">
+             <div className="p-5 bg-blue-50/50 rounded-2xl border border-blue-100">
+                <p className="font-bold text-sm text-[#003DA5] mb-2">The Value of a Meeting</p>
+                <p className="text-xs text-gray-600 leading-relaxed">SDRs learn that AE value is not in the booking, but in deal progression. Training focus: Sales stages, qualification depth, and handoff positioning.</p>
+             </div>
+             <div className="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                <p className="font-bold text-sm text-gray-800 mb-2">AE Ride-Alongs</p>
+                <p className="text-xs text-gray-600 leading-relaxed">SDRs participate in discovery calls to observe how AEs uncover business impact and navigate stakeholders. Connects prospecting activity to deal outcomes.</p>
+             </div>
+             <div className="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                <p className="font-bold text-sm text-gray-800 mb-2">Strategic Partner Shift</p>
+                <p className="text-xs text-gray-600 leading-relaxed">Focus shifts from activity to impact. Ramped SDRs bring account insights, messaging feedback, and strategy alignment to AE interactions.</p>
+             </div>
+          </div>
+       </div>
+
+       <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-100 flex flex-col relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-5"><Briefcase size={100}/></div>
+          <h4 className="font-black text-xl mb-8 flex items-center gap-3">
+             <div className="w-1.5 h-8 bg-[#FBAD26] rounded-full"></div>
+             AE Track: Understanding Pipeline Creation
+          </h4>
+          <div className="space-y-6 flex-grow">
+             <div className="p-5 bg-yellow-50/50 rounded-2xl border border-yellow-100">
+                <p className="font-bold text-sm text-gray-800 mb-2">Respect for the Complexity</p>
+                <p className="text-xs text-gray-600 leading-relaxed">AEs learn the effort required to navigate ambiguity in research and multi-channel outreach across multiple segments and products.</p>
+             </div>
+             <div className="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                <p className="font-bold text-sm text-gray-800 mb-2">SDR Ride-Alongs</p>
+                <p className="text-xs text-gray-600 leading-relaxed">AEs observe prospecting sessions and may complete a prospecting simulation to understand the difficulty of generating early engagement.</p>
+             </div>
+             <div className="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                <p className="font-bold text-sm text-gray-800 mb-2">Coaching Accountability</p>
+                <p className="text-xs text-gray-600 leading-relaxed">AEs are trained on SLA-based feedback (48h). Timely, specific feedback is identified as the core mechanism for improving pipeline quality.</p>
+             </div>
+          </div>
+       </div>
+    </div>
+
+    {/* SECTION 10: SDR TO AE CAREER DEVELOPMENT PROGRAM */}
+    <div className="mb-20">
+      <SectionHeading title="SDR to AE Career Development Program" subtitle="Formal Pathway to Account Executive" />
+      <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-xl mb-16 relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-10 opacity-5">
+          <Rocket size={200} />
+        </div>
+        <div className="relative z-10">
+          <h3 className="text-2xl font-black mb-6 text-gray-900 italic">
+            Bridging the Gap from Prospecting to Closing
+          </h3>
+          <p className="text-gray-600 leading-relaxed mb-8 max-w-4xl font-medium">
+            The SDR to AE Career Development Program is the formal development pathway
+            that prepares high-performing SDRs to become Account Executives at Trimble.
+            Through a structured, multi-month learning journey, SDRs build the mindset,
+            skills, and practical experience required to manage opportunities across the
+            full sales cycle.
+          </p>
+                
+          <div className="bg-[#003DA5] text-white p-8 rounded-3xl shadow-2xl relative">
+            <div className="flex items-center gap-4 mb-8 border-b border-white/20 pb-4">
+                <div className="p-2 bg-white/10 rounded-lg">
+                   <GraduationCap className="text-[#FBAD26]" size={32} />
+                </div>
+                <h4 className="text-xl font-bold uppercase tracking-tight">Core Competency Outcomes</h4>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[
+                  { t: "Discovery Mastery", d: "Lead structured discovery conversations to diagnose deep customer pain." },
+                  { t: "Business Case Validation", d: "Build and validate credible business cases that justify investment." },
+                  { t: "Pipeline Advancement", d: "Advance opportunities through defined stages using strategic deal logic." },
+                  { t: "Account Strategy", d: "Collaborate effectively with internal partners on high-impact account plans." },
+                  { t: "Market Intelligence", d: "Share high-fidelity messaging insights and emerging customer signals." },
+                  { t: "Outcome Progression", d: "Translate qualification standards into bottom-of-funnel revenue results." }
+                ].map((outcome, i) => (
+                  <div key={i} className="space-y-2 group">
+                      <div className="flex items-center gap-2">
+                        <CheckSquare size={16} className="text-[#FBAD26] shrink-0" />
+                        <p className="font-bold text-sm text-white group-hover:text-[#FBAD26] transition-colors">{outcome.t}</p>
+                      </div>
+                      <p className="text-11px text-blue-100 opacity-80 leading-relaxed">{outcome.d}</p>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// --- MAIN APP COMPONENT ---
+
+export default function App() {
+  const [activeSection, setActiveSection] = useState('cover');
+
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+  }, []);
+
+  const menuItems = [
+    { id: 'cover', label: 'Playbook Overview', icon: BookOpen },
+    { id: 'principles', label: 'Core Principles', icon: Heart },
+    { id: 'roles', label: 'Roles & Responsibilities', icon: Users },
+    { id: 'roe', label: 'Rules of Engagement', icon: ShieldCheck },
+    { id: 'handoff', label: 'Qualification & Handoff', icon: ArrowRight },
+    { id: 'cadence', label: 'Communication Cadence', icon: Clock },
+    { id: 'strategy', label: 'Target Account Strategy', icon: Map },
+    { id: 'metrics', label: 'Performance Metrics', icon: BarChart3 },
+    { id: 'onboarding', label: 'Partnership Onboarding & Career Development', icon: GraduationCap },
+  ];
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'cover': return <CoverSection />;
+      case 'principles': return <PrinciplesSection />;
+      case 'roles': return <RolesSection />;
+      case 'roe': return <RulesSection />;
+      case 'handoff': return <HandoffSection />;
+      case 'cadence': return <CadenceSection />;
+      case 'strategy': return <AccountStrategySection />;
+      case 'metrics': return <MetricsSection />;
+      case 'onboarding': return <OnboardingSection />;
+      default: return <CoverSection />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] font-['Open_Sans'] text-[#252A2E] flex flex-col">
+      <TopHeader />
+      
+      <div className="flex flex-1 max-w-[1400px] mx-auto w-full">
+        {/* Sidebar Navigation */}
+        <aside className="hidden lg:block w-72 shrink-0 p-8 border-r border-gray-200 bg-white shadow-sm z-10">
+          <div className="sticky top-24">
+            <nav className="space-y-2">
+              <p className="text-xs uppercase font-extrabold text-gray-400 tracking-[0.15em] mb-6">Directory Index</p>
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveSection(item.id)}
+                    className={`w-full flex items-center gap-4 p-3.5 rounded-lg text-left transition-all font-semibold ${
+                      activeSection === item.id 
+                        ? 'bg-[#003DA5] text-white shadow-md' 
+                        : 'hover:bg-slate-50 text-gray-600 hover:text-[#003DA5]'
+                    }`}
+                  >
+                    <Icon size={20} className={activeSection === item.id ? 'text-[#FBAD26]' : ''} />
+                    <span className="text-sm">{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+
+            <div className="mt-12 p-6 bg-slate-50 border border-gray-100 rounded-2xl shadow-inner">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Live Strategy</p>
+              <p className="text-sm font-extrabold text-[#252A2E] leading-snug">SDR & AE Partnership Playbook 2026</p>
+              <div className="mt-4 flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#FBAD26] animate-pulse"></div>
+                <span className="text-[11px] font-bold text-[#003DA5] uppercase tracking-wider">Active Version</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Mobile Nav */}
+        <div className="lg:hidden p-4 bg-white border-b border-gray-200 w-full sticky top-[73px] z-40">
+           <select 
+             className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg font-semibold text-[#003DA5] outline-none shadow-sm"
+             value={activeSection}
+             onChange={(e) => setActiveSection(e.target.value)}
+           >
+             {menuItems.map(item => (
+               <option key={item.id} value={item.id}>{item.label}</option>
+             ))}
+           </select>
+        </div>
+
+        {/* Main Content Area */}
+        <main className="flex-1 w-full max-w-5xl p-6 md:p-12 pb-0 overflow-x-hidden">
+          {renderContent()}
+          <Footer />
+        </main>
+      </div>
+    </div>
+  );
+}
+
